@@ -1,0 +1,117 @@
+services:
+
+  # ── MongoDB ────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:8.0.11
+    container_name: ms-product-catalog-mongo
+    restart: always
+
+    ports:
+      - "27017:27017"
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-change-me-in-production}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-db-product-catalog}
+
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+
+    healthcheck:
+      test: >
+        echo 'db.runCommand("ping").ok'
+        | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+    # Default json-file driver has no cap; unbounded logs fill the disk.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    #  Prevents any process within the container from gaining additional privileges after it has started.
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - product-catalog-network
+
+  # ── Mongo Express (Dev GUI) ────────────────────────────────────
+  mongo-express:
+    image: mongo-express:latest
+    container_name: ms-product-catalog-mongo-express
+    restart: unless-stopped
+
+    ports:
+      - "8081:8081"
+
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-change-me-in-production}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-change-me-in-production}
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+    #  Prevents any process within the container from gaining additional privileges after it has started.
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - product-catalog-network
+
+  # ── Application (uncomment to run the full stack locally) ──────
+  # app:
+  #   build: .
+  #   container_name: ms-product-catalog-app
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SERVER_PORT: 8080
+  #     SPRING_PROFILES_ACTIVE: prod
+  #     # Inject the connection string at runtime — NEVER hardcode it.
+  #     # Use a .env file (gitignored) or a secrets manager.
+  #     SPRING_DATA_MONGODB_URI: >-
+  #       mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
+  #   depends_on:
+  #     mongodb:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus:   "1.0"
+  #         memory: 256M   # native image is very lean — 256 MB is generous
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   networks:
+  #     - product-catalog-network
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  product-catalog-network:
+    driver: bridge

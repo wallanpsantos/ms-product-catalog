@@ -1,0 +1,49 @@
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Gradle build outputs and caches (biggest savings)
+build/
+.gradle/
+out/
+
+# IDE and editor configs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# Claude / AI tooling
+.claude/
+.aiignore
+
+# CI/CD — no need inside the image
+.github/
+
+# Local environment files (prevent secret leakage)
+.env
+.env.*
+*.local
+application-local.yml
+application-local.properties
+
+# Documentation — not needed at runtime
+docs/
+*.md
+LICENSE
+
+# Test files — not needed in production image
+src/test/
+
+# Docker files themselves
+Dockerfile*
+docker-compose*
+compose.yml
+
+# Logs and temp files
+*.log
+*.tmp
+

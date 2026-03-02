@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ms-product-catalog
+  mongodb:
+    uri: mongodb://${MONGO_ROOT_USERNAME:admin}:${MONGO_ROOT_PASSWORD:change-me-in-production}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB_NAME:db-product-catalog}?authSource=admin
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.example.catalog: DEBUG
