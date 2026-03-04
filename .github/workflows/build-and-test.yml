@@ -69,6 +69,16 @@ jobs:
           -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
           -Dsonar.host.url=https://sonarcloud.io
 
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          # fetch-depth: 0 faz um clone completo (full clone) em vez do shallow clone padrão.
+          # O Sonar precisa do histórico completo do Git para:
+          #   - Atribuir issues automaticamente ao autor da linha (blame/auto-assignment)
+          #   - Calcular métricas de novo código vs. código existente corretamente
+          # Sem isso, o Sonar analisa apenas o commit mais recente e perde o contexto de SCM.
+          fetch-depth: 0
+
       # Upload the JaCoCo XML report so it can be consumed by coverage tools
       # (e.g. Codecov, SonarCloud) or inspected manually.
       - name: Upload JaCoCo coverage report
