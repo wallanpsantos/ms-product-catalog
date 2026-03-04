@@ -30,7 +30,7 @@ public class DomainException extends RuntimeException {
     }
 
     public static DomainException with(final List<Error> errors) {
-        final var message = errors.isEmpty() ? "" : errors.get(0).message();
+        final var message = errors.isEmpty() ? "" : errors.getFirst().message();
         return new DomainException(message, errors);
     }
 

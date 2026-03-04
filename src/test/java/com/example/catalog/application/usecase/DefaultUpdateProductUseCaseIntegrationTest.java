@@ -4,7 +4,6 @@ import com.example.catalog.IntegrationTest;
 import com.example.catalog.application.port.input.CreateProductUseCase;
 import com.example.catalog.application.port.input.UpdateProductUseCase;
 import com.example.catalog.domain.exception.NotFoundException;
-import com.example.catalog.domain.exception.NotificationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +61,8 @@ class DefaultUpdateProductUseCaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve lançar NotificationException quando dados são inválidos")
-    void shouldThrowNotificationExceptionWhenDataIsInvalid() {
+    @DisplayName("Deve lançar DomainException quando dados são inválidos (fail-fast)")
+    void shouldThrowDomainExceptionWhenDataIsInvalid() {
         // Given
         final var createInput = new CreateProductUseCase.Input(
                 "Valid Name", "Valid Desc", "Cat", "Brand", BigDecimal.TEN, true
@@ -78,9 +77,7 @@ class DefaultUpdateProductUseCaseIntegrationTest {
         // When
         // Then
         assertThatThrownBy(() -> updateProductUseCase.execute(updateInput))
-                .isInstanceOf(NotificationException.class)
-                .hasMessageContaining("Não foi possível atualizar o Agregado de Produto")
-                .extracting(ex -> ((NotificationException) ex).getErrors().size())
-                .isEqualTo(5); // name, description, category, brand, price
+                .isInstanceOf(com.example.catalog.domain.exception.DomainException.class)
+                .hasMessageContaining("'name' should not be empty or null");
     }
 }

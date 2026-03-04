@@ -19,19 +19,26 @@ import java.util.Objects;
  *   <li>Mecanismos de validação defensiva (via herança de {@link AssertionConcern}).</li>
  * </ul>
  * </p>
+ * <p>
+ * <strong>Por que NÃO usamos {@code record} para Entidades?</strong>
+ * <ol>
+ *   <li><strong>Mutabilidade e Ciclo de Vida:</strong> Entidades mudam de estado ao longo do tempo. Records são projetados para serem imutáveis (JEP 395). Forçar a imutabilidade absoluta em entidades complexas exigiria recriar o objeto a cada mudança, prejudicando o encapsulamento e a modelagem do domínio.</li>
+ *   <li><strong>Identidade vs. Igualdade Estrutural:</strong> A regra de ouro de uma Entidade é que ela é identificada <em>exclusivamente pelo seu ID</em>. Records geram {@code equals()} que compara <em>todos</em> os campos. Classes regulares permitem sobrescrever {@code equals()} e {@code hashCode()} para comparar apenas o ID (como feito nesta classe).</li>
+ * </ol>
+ * </p>
  *
- * @param <ID> Tipo do identificador da entidade (deve estender {@link Identifier}).
+ * @param <T> Tipo do identificador da entidade (deve estender {@link Identifier}).
  */
-public abstract class Entity<ID extends Identifier> extends AssertionConcern {
+public abstract class Entity<T extends Identifier> extends AssertionConcern {
 
-    protected final ID id;
+    protected final T id;
 
-    protected Entity(final ID id) {
+    protected Entity(final T id) {
         assertArgumentNotNull(id, "'id' must not be null");
         this.id = id;
     }
 
-    public ID getId() {
+    public T getId() {
         return id;
     }
 

@@ -3,10 +3,10 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.application.port.input.ListActiveProductsUseCase;
 import com.example.catalog.application.port.output.ProductQueryGateway;
 import com.example.catalog.application.port.output.dto.ProductSummary;
+import com.example.catalog.domain.pagination.Pagination;
+import com.example.catalog.domain.pagination.SearchQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Objects;
 
@@ -29,10 +29,10 @@ public class DefaultListActiveProductsUseCase extends ListActiveProductsUseCase 
     }
 
     @Override
-    public Page<Output> execute(final Pageable pageable) {
-        log.info("Listando produtos ativos. page={}", pageable.getPageNumber());
-        final var page = productGateway.findAllActiveSummary(pageable).map(this::toOutput);
-        log.info("Listagem de produtos ativos concluída. totalElements={}", page.getTotalElements());
+    public Pagination<Output> execute(final SearchQuery query) {
+        log.info("Listando produtos ativos. page={}", query.page());
+        final var page = productGateway.findAllActiveSummary(query).map(this::toOutput);
+        log.info("Listagem de produtos ativos concluída. totalElements={}", page.total());
         return page;
     }
 

@@ -1,5 +1,6 @@
 package com.example.catalog.infrastructure.adapter.input.rest;
 
+import com.example.catalog.domain.pagination.Pagination;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.SearchRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.response.ProductResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,7 +52,7 @@ public interface ProductQueryApi {
             @ApiResponse(responseCode = "422", description = "A invalid parameter was received"),
             @ApiResponse(responseCode = "500", description = "An internal server error was thrown"),
     })
-    ResponseEntity<Page<ProductResponse>> listProducts(
+    ResponseEntity<Pagination<ProductResponse>> listProducts(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "perPage", defaultValue = "10") int perPage,
             @RequestParam(name = "sort", defaultValue = "name") String sort,

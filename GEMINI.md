@@ -83,7 +83,7 @@
 - **Methods**: single responsibility, max ~20 lines; extract logic with intention-revealing names
 - **Conditionals**: avoid negation (`!isInactive` -> `isActive`); no nested ifs — use early return / guard clauses
 - **Magic values**: no magic numbers or strings inline — extract to named constants
-- **Nulls**: never return or pass `null`; use `Optional` for absent values and fail-fast in constructors
+- **Nulls**: never return or pass `null` (not even in case of validation failure or if there are no errors). Modern Java encourages the use of `Optional` to represent the absence of a value and thus avoid the dreaded `NullPointerException`. Use fail-fast in constructors.
 
 ## Testing:
 

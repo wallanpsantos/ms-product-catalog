@@ -1,9 +1,9 @@
 package com.example.catalog.application.port.output;
 
 import com.example.catalog.application.port.output.dto.ProductSummary;
+import com.example.catalog.domain.pagination.Pagination;
+import com.example.catalog.domain.pagination.SearchQuery;
 import com.example.catalog.domain.product.ProductID;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public interface ProductQueryGateway {
 
     Optional<ProductSummary> findSummaryById(ProductID id);
 
-    Page<ProductSummary> findAllActiveSummary(Pageable pageable);
+    Pagination<ProductSummary> findAllActiveSummary(SearchQuery query);
 
     List<ProductSummary> searchProductsSummary(String query);
 }

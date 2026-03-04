@@ -1,6 +1,7 @@
 package com.example.catalog.domain.validation;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Contrato para o padrão **Notification Pattern**.
@@ -24,7 +25,7 @@ public interface ValidationHandler {
 
     ValidationHandler append(ValidationHandler anHandler);
 
-    <T> T validate(Validation<T> aValidation);
+    <T> Optional<T> validate(Validation<T> aValidation);
 
     List<Error> getErrors();
 
@@ -32,11 +33,11 @@ public interface ValidationHandler {
         return getErrors() != null && !getErrors().isEmpty();
     }
 
-    default Error firstError() {
+    default Optional<Error> firstError() {
         if (getErrors() != null && !getErrors().isEmpty()) {
-            return getErrors().get(0);
+            return Optional.of(getErrors().getFirst());
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 

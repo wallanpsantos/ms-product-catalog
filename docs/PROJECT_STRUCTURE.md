@@ -28,25 +28,30 @@ Contém a lógica de negócios pura, entidades e regras. **Sem dependências de 
 - **`ValueObject.java`**: Interface marcadora para Objetos de Valor. VOs são imutáveis e sua igualdade é definida pelos atributos, não pela identidade do objeto.
 - **`Identifier.java`**: Classe abstrata base para todos os identificadores de domínio. Estende `ValueObject` e implementa `equals`/`hashCode` com base no valor do identificador (`getValue()`).
 - **`Entity.java`**: Classe abstrata base para todas as Entidades. Armazena o `ID` tipado e define igualdade baseada no identificador. Declara o método `validate(ValidationHandler)`, que força todas as entidades a implementar validação via Notification Pattern.
-- **`AssertionConcern.java`**: Utilitário de validações defensivas (guards) de fail-fast. Fornece métodos como `assertArgumentNotNull`, `assertArgumentNotEmpty`, `assertArgumentPositive` e `assertArgumentLength`, que lançam `DomainException` imediatamente na primeira violação. **Nota:** atualmente nenhuma entidade do domínio estende esta classe diretamente; o `Product` utiliza `ProductValidator` com o Notification Pattern para acumular múltiplos erros ao invés de falhar no primeiro.
+- **`AssertionConcern.java`**: Utilitário de validações defensivas (guards) de fail-fast. Fornece métodos como `assertArgumentNotNull`, `assertArgumentNotEmpty`, `assertArgumentPositive` e `assertArgumentLength`, que lançam `DomainException` imediatamente na primeira violação. O `Product` utiliza esta classe para validações de integridade técnica imediatas, em conjunto com o `ProductValidator` (Notification Pattern) para regras de negócio mais complexas.
 
 #### `product/` — Agregado Principal
 
-- **`Product.java`**: Entidade raiz do agregado (Aggregate Root). Encapsula todos os atributos do produto (`name`, `description`, `category`, `brand`, `price`, `active`, `createdAt`, `updatedAt`). Construtor é privado; instâncias são criadas via factory methods estáticos. Utiliza `AssertionConcern` no construtor para validação defensiva técnica (Fail-Fast).
+- **`Product.java`**: Entidade raiz do agregado (Aggregate Root). Encapsula todos os atributos do produto (`name`, `description`, `category`, `brand`, `price`, `active`, `createdAt`, `updatedAt`). Construtor é privado; instâncias são criadas via factory methods estáticos. Utiliza `AssertionConcern` para validação defensiva técnica (Fail-Fast) tanto no construtor quanto no método `update`.
   - `newProduct(...)`: gera um novo `ProductID` único (UUID) e define `createdAt`/`updatedAt` com `LocalDateTime.now()`.
   - `with(...)`: reconstrói uma entidade a partir de dados persistidos.
-  - `update(...)`: atualiza os campos e define `updatedAt` com o timestamp atual.
+  - `update(...)`: aplica validações fail-fast, atualiza os campos e define `updatedAt` com o timestamp atual.
   - `deactivate()`: define `active = false` e atualiza `updatedAt`. Implementa soft-delete.
   - `validate(ValidationHandler)`: delega para `ProductValidator`.
 - **`ProductID.java`**: Value Object que encapsula o identificador único do produto como `String` (UUID). Criado via `ProductID.unique()` ou `ProductID.from(String)`.
 - **`ProductValidator.java`**: Implementa as invariantes do agregado `Product` via Notification Pattern (acumula todos os erros antes de retornar). Valida: `name` (obrigatório, máximo 255 caracteres), `description` (obrigatório, máximo 4000 caracteres), `category` (obrigatório), `brand` (obrigatório) e `price` (obrigatório, deve ser maior que zero).
 
+#### `pagination/` — Paginação Nativa
+
+- **`Pagination.java`**: Objeto de domínio (`record`) que representa uma página de resultados, mantendo o core livre de dependências do Spring (`Page`).
+- **`SearchQuery.java`**: Objeto de domínio (`record`) que encapsula os critérios de busca (página, quantidade, ordenação), mantendo o core livre de dependências do Spring (`Pageable`).
+
 #### `validation/` — Framework de Validação
 
 - **`Error.java`**: `record` que encapsula uma mensagem de erro de validação (`String message`).
-- **`ValidationHandler.java`**: Interface central do Notification Pattern. Define `append(Error)`, `append(ValidationHandler)`, `validate(Validation<T>)`, `getErrors()`. Inclui métodos default `hasError()` e `firstError()`.
+- **`ValidationHandler.java`**: Interface central do Notification Pattern. Define `append(Error)`, `append(ValidationHandler)`, `validate(Validation<T>)`, `getErrors()`. Inclui métodos default `hasError()` e `firstError()`. Como boa prática do Java moderno, evita o uso de nulls retornando `Optional<Error>` e `Optional<T>`.
 - **`Validator.java`**: Classe abstrata base para todos os validadores. Recebe um `ValidationHandler` no construtor e expõe o método abstrato `validate()`.
-- **`handler/Notification.java`**: Implementação concreta de `ValidationHandler`. Acumula múltiplos erros em uma lista interna em vez de lançar exceção imediata. O método `validate(Validation<T>)` captura `DomainException` e exceções genéricas, adicionando seus erros à lista.
+- **`handler/Notification.java`**: Implementação concreta de `ValidationHandler`. Acumula múltiplos erros em uma lista interna em vez de lançar exceção imediata. O método `validate(Validation<T>)` captura `DomainException` e `Exception` (evitando capturar `Throwable` para não engolir erros catastróficos da JVM como `OutOfMemoryError`), adicionando seus erros à lista e retornando um `Optional` seguro.
 
 #### `exception/` — Exceções do Domínio
 
@@ -60,30 +65,32 @@ Contém a lógica de negócios pura, entidades e regras. **Sem dependências de 
 
 Camada de orquestração dos casos de uso. Coordena operações entre o domínio e as portas de saída. **Não possui anotações de Spring** — os beans são criados em `UseCaseConfig` na camada de infraestrutura.
 
-- **`UseCase<IN, OUT>`**: Classe abstrata base para casos de uso que recebem um input e retornam um output. Define `execute(IN)` (abstrato) e `execute(IN, Presenter)` (com transformação de saída).
-- **`NullaryUseCase<OUT>`**: Variante de `UseCase` para casos de uso sem input (ex.: listagem sem parâmetros). Define `execute()` e `execute(Presenter)`.
-- **`Presenter<UC_OUT, NEW_OUT>`**: Interface funcional (`Function`) para transformação da saída dos casos de uso. Permite que o chamador defina a apresentação do resultado sem alterar o caso de uso.
+- **`UseCase<IN, OUT>`** / **`Command<IN, OUT>`** / **`Query<IN, OUT>`**: Classes abstratas bases baseadas no padrão de segregação CQS.
+- **`NullaryUseCase<OUT>`**: Variante de `UseCase` para casos de uso sem input.
+- **`Presenter<UC_OUT, NEW_OUT>`**: Interface funcional (`Function`) para transformação da saída dos casos de uso.
 
 #### `port/input/` — Portas de Entrada (Driving Ports)
 
-Contratos que os adaptadores primários (REST) invocam. Cada porta é uma classe abstrata que estende `UseCase` e define **Records** para `Input` e `Output`, garantindo tipagem forte e imutabilidade:
+Contratos que os adaptadores primários (REST) invocam. Cada porta é uma classe abstrata (Command ou Query) que estende as classes base e define **Records** para `Input` e `Output`, garantindo tipagem forte e imutabilidade:
 
 - **`CreateProductUseCase`**: `Input` contém os dados para criação; `Output` retorna apenas o `id` do produto criado.
 - **`CreateProductBatchUseCase`**: Opera com listas de Input/Output do `CreateProductUseCase` para inserção em lote.
-- **`GetProductByIdUseCase`**: `Input` encapsula o `id`; `Output` contém todos os campos do produto.
-- **`UpdateProductUseCase`**: `Input` contém `id` e todos os campos atualizáveis; `Output` retorna o produto completo atualizado.
+- **`GetProductByIdUseCase`**: `Input` encapsula o `id`; `Output` contém o DTO de leitura do produto.
+- **`UpdateProductUseCase`**: `Input` contém `id` e todos os campos atualizáveis; `Output` retorna o `id` modificado.
 - **`UpdateProductBatchUseCase`**: Opera com listas de Input/Output do `UpdateProductUseCase` para atualização em lote.
 - **`DeactivateProductUseCase`**: `Input` com `id`; `Output` vazio (void).
-- **`ListActiveProductsUseCase`**: Estende `UseCase<Pageable, Page<Output>>`. Recebe um `Pageable` do Spring Data e retorna uma `Page` paginada de produtos.
+- **`ListActiveProductsUseCase`**: Recebe um `SearchQuery` nativo do domínio e retorna uma `Pagination<Output>` nativa (livre de Spring Data).
 - **`SearchProductsUseCase`**: `Input` encapsula a `query` de busca; `Output` é uma lista de produtos correspondentes.
 
 #### `port/output/` — Portas de Saída (Driven Ports)
 
-- **`ProductGateway.java`**: Interface que define o contrato de persistência. Métodos: `create`, `createAll`, `update`, `updateAll`, `findById(ProductID)`, `findAllById(List<ProductID>)`, `findAllActive(Pageable)`, `searchByText(String)`. Implementada pelo `ProductMongoAdapter`.
+A arquitetura aplica segregação de interfaces (ISP) baseada em CQRS-Lite, dividindo as portas de saída em duas:
+- **`ProductCommandGateway.java`**: Lado de escrita. Métodos que alteram estado: `create`, `createAll`, `update`, `updateAll`, e métodos para resgatar entidades ricas do banco de dados `findById(ProductID)`, `findAllById(List<ProductID>)`.
+- **`ProductQueryGateway.java`**: Lado de leitura. Métodos focados em projeção e buscas sem efeito colateral: `findSummaryById`, `findAllActiveSummary(SearchQuery)`, `searchProductsSummary(String)`. Utiliza a classe `ProductSummary` para contornar a hidratação desnecessária da entidade de domínio rica (Domain Bypass).
 
 #### `usecase/` — Implementações dos Casos de Uso
 
-Todos os casos de uso são POJOs puros que recebem o `ProductGateway` via construtor.
+Todos os casos de uso são POJOs puros que recebem o(s) Gateway(s) via construtor.
 
 - **`DefaultCreateProductUseCase`**: Cria `Product`, valida via `Notification` e persiste.
 - **`DefaultCreateProductBatchUseCase`**: Itera sobre a lista de inputs, cria e valida cada produto individualmente (acumulando erros por item se necessário), e utiliza `gateway.createAll` para persistência eficiente.
@@ -99,28 +106,30 @@ Implementações concretas das interfaces definidas no domínio e aplicação. C
 
 #### `config/` — Configurações Spring
 
-- **`UseCaseConfig.java`**: "Glue Code" da arquitetura hexagonal. Instancia todos os casos de uso (single e batch) como `@Bean`, injetando o `ProductGateway`.
+- **`UseCaseConfig.java`**: "Glue Code" da arquitetura hexagonal. Instancia todos os casos de uso (single e batch) como `@Bean`, injetando os respectivos Gateways.
 - **`MongoConfig.java`**: Habilita MongoDB Auditing.
 
 #### `adapter/input/` — Adaptadores Primários (Driving Adapters)
 
 ##### `rest/`
 
-- **`ProductApi.java`**: Interface que define o contrato da API REST e documentação Swagger/OpenAPI.
-- **`controller/ProductController.java`**: `@RestController` que implementa `ProductApi`. Recebe HTTP, usa `ProductRestMapper` para converter DTOs em Inputs de UseCase, executa a lógica e retorna ResponseEntity. Suporta operações em lote nos endpoints `/batch`.
+O projeto segue a segregação de responsabilidades de leitura e escrita (CQRS-Lite):
+- **`ProductCommandApi.java`** / **`ProductQueryApi.java`**: Interfaces que definem os contratos da API REST e documentação Swagger/OpenAPI (OpenAPI 3), divididas entre mutações (Commands) e leituras (Queries).
+- **`controller/ProductCommandController.java`**: `@RestController` focado nas operações `POST`, `PUT` e `DELETE`.
+- **`controller/ProductQueryController.java`**: `@RestController` focado em operações `GET` e `POST /search`. Traduz os parâmetros HTTP de paginação para o objeto de domínio `SearchQuery`.
 
 ##### `rest/dto/`
 
-- **`request/ProductRequest.java`**: DTO de entrada para criação. Records imutáveis com validação (`@NotBlank`, `@Positive`). **Não** implementa mais a interface do UseCase diretamente (desacoplamento).
+- **`request/ProductRequest.java`**: DTO de entrada para criação. Records imutáveis com validação (`@NotBlank`, `@Positive`).
 - **`request/UpdateProductRequest.java`**: DTO específico para atualização em lote, contendo obrigatoriamente o campo `id`.
 - **`request/SearchRequest.java`**: DTO para busca textual.
 - **`response/CreateProductResponse.java`**, **`ProductResponse.java`**, **`ErrorResponse.java`**: DTOs de saída padronizados.
 
 ##### `rest/mapper/`
 
-- **`ProductRestMapper.java`**: Componente crucial que converte os DTOs da API (`ProductRequest`, `UpdateProductRequest`) para os Records de Input da camada de Aplicação (`CreateProductUseCase.Input`, etc.). Garante que a camada de domínio/aplicação não conheça os DTOs web.
+- **`ProductRestMapper.java`**: Componente crucial que converte os DTOs da API (`ProductRequest`, `UpdateProductRequest`) para os Records de Input da camada de Aplicação. Garante que a camada de domínio/aplicação não conheça os DTOs web.
 
-##### `input/exception/`
+##### `exception/`
 
 - **`GlobalExceptionHandler.java`**: `@RestControllerAdvice` que intercepta `DomainException`, `NotFoundException` e erros de validação, retornando respostas HTTP padronizadas (404, 422, 500).
 
@@ -128,7 +137,8 @@ Implementações concretas das interfaces definidas no domínio e aplicação. C
 
 ##### `gateway/`
 
-- **`ProductMongoAdapter.java`**: Implementação de `ProductGateway`. Usa `ProductMongoRepository` para operações CRUD e Batch (`saveAll`, `findAllById`) e `MongoTemplate` para queries complexas (regex).
+- **`ProductMongoCommandAdapter.java`**: Implementação de `ProductCommandGateway`. Lida com inserção e atualização usando `ProductMongoRepository`.
+- **`ProductMongoQueryAdapter.java`**: Implementação de `ProductQueryGateway`. Lida com consultas usando traduções nativas (do `SearchQuery` do domínio para o `PageRequest` do Spring) e uso do `MongoTemplate` para queries complexas (regex).
 
 ##### `persistence/`
 
@@ -143,6 +153,4 @@ Implementações concretas das interfaces definidas no domínio e aplicação. C
 
 ## Tests (`src/test/`)
 
-*Nota: O diretório de testes deve ser populado para garantir a cobertura das novas funcionalidades de Batch e validações.*
-
-- **Estratégias Recomendadas:** JUnit 5 (Unitários), Testcontainers (Integração de Gateway), REST Assured (E2E).
+- **Estratégias Recomendadas:** JUnit 5 (Unitários), Testcontainers (Integração de Gateway e Repositório em banco de dados isolado), REST Assured (Testes End-to-End validando a controller e o protocolo HTTP).

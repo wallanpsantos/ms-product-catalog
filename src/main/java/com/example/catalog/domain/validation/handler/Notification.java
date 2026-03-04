@@ -6,6 +6,7 @@ import com.example.catalog.domain.validation.ValidationHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementação concreta do {@link ValidationHandler} que armazena erros em uma lista em memória.
@@ -39,7 +40,7 @@ public class Notification implements ValidationHandler {
         return new Notification(new ArrayList<>());
     }
 
-    public static Notification create(final Throwable t) {
+    public static Notification create(final Exception t) {
         return create(new Error(t.getMessage()));
     }
 
@@ -64,15 +65,15 @@ public class Notification implements ValidationHandler {
     }
 
     @Override
-    public <T> T validate(final Validation<T> aValidation) {
+    public <T> Optional<T> validate(final Validation<T> aValidation) {
         try {
-            return aValidation.validate();
+            return Optional.ofNullable(aValidation.validate());
         } catch (final DomainException ex) {
             this.errors.addAll(ex.getErrors());
-        } catch (final Throwable t) {
-            this.errors.add(new Error(t.getMessage()));
+        } catch (final Exception ex) {
+            this.errors.add(new Error(ex.getMessage()));
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override

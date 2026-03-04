@@ -3,6 +3,8 @@ package com.example.catalog.infrastructure.adapter.input.rest.controller;
 import com.example.catalog.application.port.input.GetProductByIdUseCase;
 import com.example.catalog.application.port.input.ListActiveProductsUseCase;
 import com.example.catalog.application.port.input.SearchProductsUseCase;
+import com.example.catalog.domain.pagination.Pagination;
+import com.example.catalog.domain.pagination.SearchQuery;
 import com.example.catalog.infrastructure.adapter.input.rest.ProductQueryApi;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.ProductRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.SearchRequest;
@@ -10,9 +12,6 @@ import com.example.catalog.infrastructure.adapter.input.rest.dto.request.UpdateP
 import com.example.catalog.infrastructure.adapter.input.rest.dto.response.CreateProductResponse;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.response.ProductResponse;
 import com.example.catalog.infrastructure.adapter.input.rest.mapper.ProductRestMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,16 +76,15 @@ public class ProductQueryController implements ProductQueryApi {
     }
 
     @Override
-    public ResponseEntity<Page<ProductResponse>> listProducts(
+    public ResponseEntity<Pagination<ProductResponse>> listProducts(
             final int page,
             final int perPage,
             final String sort,
             final String direction
     ) {
-        final var sortDir = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        final var pageRequest = PageRequest.of(page, perPage, Sort.by(sortDir, sort));
+        final var query = new SearchQuery(page, perPage, "", sort, direction);
 
-        final var result = listActiveProductsUseCase.execute(pageRequest)
+        final var result = listActiveProductsUseCase.execute(query)
                 .map(mapper::toResponse);
         return ResponseEntity.ok(result);
     }

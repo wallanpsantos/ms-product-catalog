@@ -41,6 +41,7 @@ public class ProductDocument {
     public ProductDocument() {
     }
 
+    @SuppressWarnings("java:S107") // Reconstitution requires all fields
     public ProductDocument(String id, String name, String description, String category, String brand, BigDecimal price, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;

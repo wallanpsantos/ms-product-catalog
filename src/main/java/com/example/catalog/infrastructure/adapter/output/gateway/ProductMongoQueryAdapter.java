@@ -2,13 +2,15 @@ package com.example.catalog.infrastructure.adapter.output.gateway;
 
 import com.example.catalog.application.port.output.ProductQueryGateway;
 import com.example.catalog.application.port.output.dto.ProductSummary;
+import com.example.catalog.domain.pagination.Pagination;
+import com.example.catalog.domain.pagination.SearchQuery;
 import com.example.catalog.domain.product.ProductID;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductDocument;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductMongoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -46,9 +48,19 @@ public class ProductMongoQueryAdapter implements ProductQueryGateway {
     }
 
     @Override
-    public Page<ProductSummary> findAllActiveSummary(final Pageable pageable) {
-        log.info("action=persistFindAllActiveSummary page={}", pageable.getPageNumber());
-        return repository.findAllByActiveTrue(pageable).map(this::toSummary);
+    public Pagination<ProductSummary> findAllActiveSummary(final SearchQuery query) {
+        log.info("action=persistFindAllActiveSummary page={}", query.page());
+        final var sortDir = "desc".equalsIgnoreCase(query.direction()) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        final var pageRequest = PageRequest.of(query.page(), query.perPage(), Sort.by(sortDir, query.sort()));
+
+        final var pageResult = repository.findAllByActiveTrue(pageRequest);
+
+        return new Pagination<>(
+                pageResult.getNumber(),
+                pageResult.getSize(),
+                pageResult.getTotalElements(),
+                pageResult.map(this::toSummary).toList()
+        );
     }
 
     @Override
@@ -86,7 +98,7 @@ public class ProductMongoQueryAdapter implements ProductQueryGateway {
                 doc.getCategory(),
                 doc.getBrand(),
                 doc.getPrice(),
-                doc.getActive() != null ? doc.getActive() : false,
+                doc.getActive() != null ? doc.getActive() : Boolean.FALSE,
                 doc.getCreatedAt(),
                 doc.getUpdatedAt()
         );

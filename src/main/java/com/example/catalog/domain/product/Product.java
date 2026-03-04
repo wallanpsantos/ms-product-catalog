@@ -5,6 +5,7 @@ import com.example.catalog.domain.validation.ValidationHandler;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Raiz do Agregado de Produto (Aggregate Root).
@@ -33,6 +34,15 @@ import java.time.LocalDateTime;
  * de integridade técnica, e {@link ProductValidator} (Notification Pattern) para
  * validação de regras de negócio complexas.
  * </p>
+ * <p>
+ * <strong>Por que NÃO usamos {@code record} para Agregados?</strong>
+ * <ol>
+ *   <li><strong>Mutabilidade e Ciclo de Vida:</strong> Agregados mudam de estado ao longo do tempo (ex: alterar preço, desativar produto).
+ *   Records em Java são estritamente imutáveis. Usá-los forçaria a recriação do agregado a cada alteração, o que quebra a clareza e a gerência de estado do modelo de domínio.</li>
+ *   <li><strong>Identidade:</strong> Assim como Entidades, Agregados são identificados exclusivamente pelo seu ID.
+ *   Records implementam igualdade estrutural comparando todos os campos, o que viola o princípio de identidade contínua do DDD.</li>
+ * </ol>
+ * </p>
  */
 public class Product extends Entity<ProductID> {
 
@@ -45,6 +55,7 @@ public class Product extends Entity<ProductID> {
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @SuppressWarnings("java:S107") // Reconstitution requires all fields
     private Product(
             final ProductID id,
             final String name,
@@ -61,7 +72,7 @@ public class Product extends Entity<ProductID> {
         this.assertArgumentLength(name, 255, "'name' must be between 1 and 255 characters");
 
         this.assertArgumentNotEmpty(description, "'description' should not be empty or null");
-        this.assertArgumentLength(description, 255, "'description' must be at most 255 characters");
+        this.assertArgumentLength(description, 4000, "'description' must be at most 4000 characters");
 
         this.assertArgumentNotEmpty(category, "'category' should not be empty or null");
 
@@ -91,6 +102,7 @@ public class Product extends Entity<ProductID> {
         return new Product(ProductID.unique(), name, description, category, brand, price, active, now, now);
     }
 
+    @SuppressWarnings("java:S107") // Reconstitution requires all fields
     public static Product with(
             final ProductID id,
             final String name,
@@ -113,6 +125,14 @@ public class Product extends Entity<ProductID> {
             final BigDecimal price,
             final boolean active
     ) {
+        this.assertArgumentNotEmpty(name, "'name' should not be empty or null");
+        this.assertArgumentLength(name, 255, "'name' must be between 1 and 255 characters");
+        this.assertArgumentNotEmpty(description, "'description' should not be empty or null");
+        this.assertArgumentLength(description, 4000, "'description' must be at most 4000 characters");
+        this.assertArgumentNotEmpty(category, "'category' should not be empty or null");
+        this.assertArgumentNotEmpty(brand, "'brand' should not be empty or null");
+        this.assertArgumentPositive(price, "'price' must be greater than zero");
+
         this.name = name;
         this.description = description;
         this.category = category;
@@ -162,5 +182,17 @@ public class Product extends Entity<ProductID> {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Product product)) return false;
+        if (!super.equals(o)) return false;
+        return active == product.active && Objects.equals(name, product.name) && Objects.equals(description, product.description) && Objects.equals(category, product.category) && Objects.equals(brand, product.brand) && Objects.equals(price, product.price) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, description, category, brand, price, active, createdAt, updatedAt);
     }
 }
