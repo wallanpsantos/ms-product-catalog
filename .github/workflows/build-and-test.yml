@@ -55,14 +55,18 @@ jobs:
 
       # `build` already compiles, runs tests (with JaCoCo), and assembles the JAR.
       # `-x nativeCompile` skips the slow GraalVM AOT step — not needed in CI.
-      - name: Build with Gradle
-        run: ./gradlew clean build -x nativeCompile
+      # `sonar` pushes the analysis and JaCoCo coverage report to SonarCloud.
+      - name: Build and Analyze with Gradle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew clean build sonar -x nativeCompile
 
       # Upload the JaCoCo XML report so it can be consumed by coverage tools
       # (e.g. Codecov, SonarCloud) or inspected manually.
       - name: Upload JaCoCo coverage report
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-report
           path: build/reports/jacoco/test/
@@ -71,7 +75,7 @@ jobs:
       # Upload only the application JAR, excluding plain/sources jars.
       - name: Archive build artifacts
         if: success()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: jar-files
           path: build/libs/*.jar
