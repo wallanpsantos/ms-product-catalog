@@ -59,6 +59,16 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x nativeCompile
 
+      - name: Run SonarCloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+        run: ./gradlew sonar
+          -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+          -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+          -Dsonar.host.url=https://sonarcloud.io
+
       # Upload the JaCoCo XML report so it can be consumed by coverage tools
       # (e.g. Codecov, SonarCloud) or inspected manually.
       - name: Upload JaCoCo coverage report

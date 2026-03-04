@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.4"
+    id("org.sonarqube") version "7.2.2.6593"
 }
 
 group = "com.example"
@@ -81,6 +82,13 @@ tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
         xml.required.set(true)
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.coverage.jacoco.xmlReportPaths",
+            "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
 
