@@ -24,6 +24,16 @@ tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
 
+tasks.withType<Test> {
+    systemProperty("file.encoding", "UTF-8")
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.withType<JavaExec> {
+    systemProperty("file.encoding", "UTF-8")
+}
+
 repositories {
     mavenCentral()
 }
@@ -38,27 +48,26 @@ extra["testcontainersVersion"] = "1.21.4"
 
 
 dependencies {
+    // Production
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    runtimeOnly("org.postgresql:postgresql")
     implementation("org.springframework.cloud:spring-cloud-starter")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
-
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springDocVersion")}")
-
     implementation("org.slf4j:slf4j-api:${property("slf4jVersion")}")
     implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
 
+    runtimeOnly("org.postgresql:postgresql")
+
+    // Test
     testImplementation("io.rest-assured:rest-assured:${property("restAssuredVersion")}")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:kafka")
     testImplementation("org.testcontainers:junit-jupiter")
-
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("com.tngtech.archunit:archunit-junit5:${property("archunitVersion")}")
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
@@ -87,8 +96,10 @@ tasks.jacocoTestReport {
 
 sonarqube {
     properties {
-        property("sonar.coverage.jacoco.xmlReportPaths",
-            "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml"
+        )
     }
 }
 
