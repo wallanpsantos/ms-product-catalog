@@ -5,40 +5,34 @@ import com.example.catalog.application.port.output.dto.ProductSummary;
 import com.example.catalog.domain.pagination.Pagination;
 import com.example.catalog.domain.pagination.SearchQuery;
 import com.example.catalog.domain.product.ProductID;
-import com.example.catalog.infrastructure.adapter.output.persistence.ProductDocument;
-import com.example.catalog.infrastructure.adapter.output.persistence.ProductMongoRepository;
+import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaEntity;
+import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
  * Adaptador de Persistência focado em LEITURA (Query Side).
  * <p>
- * Implementa o padrão Domain Bypass ao converter documentos do MongoDB diretamente
+ * Implementa o padrão Domain Bypass ao converter entidades do JPA diretamente
  * para DTOs de leitura, evitando a sobrecarga de carregar Agregados de Domínio.
  * </p>
  */
 @Component
-public class ProductMongoQueryAdapter implements ProductQueryGateway {
+public class ProductJpaQueryAdapter implements ProductQueryGateway {
 
-    private static final Logger log = LoggerFactory.getLogger(ProductMongoQueryAdapter.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductJpaQueryAdapter.class);
 
-    private final ProductMongoRepository repository;
-    private final MongoTemplate mongoTemplate;
+    private final ProductJpaRepository repository;
 
-    public ProductMongoQueryAdapter(final ProductMongoRepository repository, final MongoTemplate mongoTemplate) {
+    public ProductJpaQueryAdapter(final ProductJpaRepository repository) {
         this.repository = Objects.requireNonNull(repository);
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate);
     }
 
     @Override
@@ -66,41 +60,24 @@ public class ProductMongoQueryAdapter implements ProductQueryGateway {
     @Override
     public List<ProductSummary> searchProductsSummary(final String query) {
         log.info("action=persistSearchProductsSummary term={}", query);
-        final var results = performSearch(query).stream()
+        final var results = repository.searchActiveProducts(query).stream()
                 .map(this::toSummary)
                 .toList();
         log.info("action=persistSearchProductsSummary term={} resultsCount={}", query, results.size());
         return results;
     }
 
-    private List<ProductDocument> performSearch(final String query) {
-        final var pattern = Pattern.compile(query, Pattern.CASE_INSENSITIVE);
-
-        final var textCriteria = new Criteria().orOperator(
-                Criteria.where("name").regex(pattern),
-                Criteria.where("description").regex(pattern),
-                Criteria.where("category").regex(pattern),
-                Criteria.where("brand").regex(pattern)
-        );
-        final var criteria = new Criteria().andOperator(
-                Criteria.where("active").is(true),
-                textCriteria
-        );
-
-        return mongoTemplate.find(new Query(criteria), ProductDocument.class);
-    }
-
-    private ProductSummary toSummary(final ProductDocument doc) {
+    private ProductSummary toSummary(final ProductJpaEntity entity) {
         return new ProductSummary(
-                doc.getId(),
-                doc.getName(),
-                doc.getDescription(),
-                doc.getCategory(),
-                doc.getBrand(),
-                doc.getPrice(),
-                doc.getActive() != null ? doc.getActive() : Boolean.FALSE,
-                doc.getCreatedAt(),
-                doc.getUpdatedAt()
+                entity.getId(),
+                entity.getName(),
+                entity.getDescription(),
+                entity.getCategory(),
+                entity.getBrand(),
+                entity.getPrice(),
+                entity.getActive() != null ? entity.getActive() : Boolean.FALSE,
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

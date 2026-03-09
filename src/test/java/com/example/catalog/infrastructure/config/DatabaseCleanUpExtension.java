@@ -1,6 +1,6 @@
 package com.example.catalog.infrastructure.config;
 
-import com.example.catalog.infrastructure.adapter.output.persistence.ProductMongoRepository;
+import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.data.repository.CrudRepository;
@@ -13,7 +13,7 @@ import java.util.List;
  * Extensão do JUnit 5 responsável por limpar o banco de dados antes de cada teste.
  * <p>
  * O objetivo é garantir um ambiente limpo e isolado (Clean Slate) para cada cenário de teste,
- * deletando todos os dados de repositórios específicos (ex: ProductMongoRepository).
+ * deletando todos os dados de repositórios específicos (ex: ProductJpaRepository).
  * </p>
  * <p>
  * Usada principalmente pelas anotações customizadas como @IntegrationTest e @E2ETest.
@@ -26,7 +26,7 @@ public class DatabaseCleanUpExtension implements BeforeEachCallback {
         final var appContext = SpringExtension.getApplicationContext(context);
 
         cleanUp(List.of(
-                appContext.getBean(ProductMongoRepository.class)
+                appContext.getBean(ProductJpaRepository.class)
         ));
     }
 

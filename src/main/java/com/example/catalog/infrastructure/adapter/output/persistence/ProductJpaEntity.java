@@ -1,48 +1,64 @@
 package com.example.catalog.infrastructure.adapter.output.persistence;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.EntityListeners;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * Modelo de persistência mapeado para a coleção "products" do MongoDB.
+ * Modelo de persistência mapeado para a tabela "products" do PostgreSQL.
  * <p>
- * Esta classe isola o domínio dos detalhes de infraestrutura (anotações do Spring Data Mongo).
+ * Esta classe isola o domínio dos detalhes de infraestrutura (anotações do Spring Data JPA).
  * Inclui métodos de conversão `from` e `toEntity` para transitar entre os mundos.
  * </p>
- * <p>
- * Utiliza anotações de auditoria (`@CreatedDate`, `@LastModifiedDate`) para rastrear
- * automaticamente a criação e atualização dos registros.
- * </p>
  */
-@Document(collection = "products")
-public class ProductDocument {
+@Entity
+@Table(name = "products")
+@EntityListeners(AuditingEntityListener.class)
+public class ProductJpaEntity {
 
     @Id
     private String id;
+    
+    @Column(nullable = false)
     private String name;
+    
+    @Column(nullable = false, length = 1000)
     private String description;
+    
+    @Column(nullable = false)
     private String category;
+    
+    @Column(nullable = false)
     private String brand;
+    
+    @Column(nullable = false)
     private BigDecimal price;
+    
+    @Column(nullable = false)
     private Boolean active;
 
     @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public ProductDocument() {
+    public ProductJpaEntity() {
     }
 
-    @SuppressWarnings("java:S107") // Reconstitution requires all fields
-    public ProductDocument(String id, String name, String description, String category, String brand, BigDecimal price, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    @SuppressWarnings("java:S107")
+    public ProductJpaEntity(String id, String name, String description, String category, String brand, BigDecimal price, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -54,8 +70,8 @@ public class ProductDocument {
         this.updatedAt = updatedAt;
     }
 
-    public static ProductDocument from(final com.example.catalog.domain.product.Product product) {
-        return new ProductDocument(
+    public static ProductJpaEntity from(final com.example.catalog.domain.product.Product product) {
+        return new ProductJpaEntity(
                 product.getId().getValue(),
                 product.getName(),
                 product.getDescription(),
@@ -158,7 +174,7 @@ public class ProductDocument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProductDocument that = (ProductDocument) o;
+        ProductJpaEntity that = (ProductJpaEntity) o;
         return Objects.equals(id, that.id);
     }
 
@@ -169,7 +185,7 @@ public class ProductDocument {
 
     @Override
     public String toString() {
-        return "ProductDocument{" +
+        return "ProductJpaEntity{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
