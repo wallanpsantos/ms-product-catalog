@@ -1,13 +1,13 @@
 package com.example.catalog.infrastructure.adapter.output.persistence;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import jakarta.persistence.EntityListeners;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,22 +27,22 @@ public class ProductJpaEntity {
 
     @Id
     private String id;
-    
+
     @Column(nullable = false)
     private String name;
-    
+
     @Column(nullable = false, length = 1000)
     private String description;
-    
+
     @Column(nullable = false)
     private String category;
-    
+
     @Column(nullable = false)
     private String brand;
-    
+
     @Column(nullable = false)
     private BigDecimal price;
-    
+
     @Column(nullable = false)
     private Boolean active;
 

@@ -16,9 +16,9 @@ public interface ProductJpaRepository extends JpaRepository<ProductJpaEntity, St
     Page<ProductJpaEntity> findAllByActiveTrue(Pageable pageable);
 
     @Query("SELECT p FROM ProductJpaEntity p WHERE p.active = true AND (" +
-           "LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(p.category) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(p.brand) LIKE LOWER(CONCAT('%', :query, '%')))")
+            "LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(p.category) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(p.brand) LIKE LOWER(CONCAT('%', :query, '%')))")
     List<ProductJpaEntity> searchActiveProducts(@Param("query") String query);
 }
