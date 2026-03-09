@@ -66,7 +66,7 @@ O `ms-product-catalog` é um microsserviço de catálogo de produtos que impleme
 |-----------------------|----------------------------------|-----------------------------|
 | Linguagem             | Java                             | 21                          |
 | Framework             | Spring Boot                      | 4.0.3                       |
-| Banco de Dados        | PostgreSQL                       | 16.2                        |
+| Banco de Dados        | PostgreSQL                       | 18.3                        |
 | Compilação Nativa     | GraalVM Native Image             | 21.0.2                      |
 | Resiliência           | Resilience4j (Circuit Breaker)   | 2025.1.0 (via Spring Cloud) |
 | Documentação API      | SpringDoc OpenAPI 3 (Swagger UI) | 3.0.1                       |
@@ -176,12 +176,12 @@ Execute apenas testes de arquitetura:
 
 Após iniciar a aplicação, acesse:
 
-| Interface     | URL                                                                            |
-|---------------|--------------------------------------------------------------------------------|
-| Swagger UI    | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
-| OpenAPI JSON  | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)         |
-| Health Check  | [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) |
-| pgAdmin       | [http://localhost:8081](http://localhost:8081)                                 |
+| Interface    | URL                                                                            |
+|--------------|--------------------------------------------------------------------------------|
+| Swagger UI   | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
+| OpenAPI JSON | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)         |
+| Health Check | [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) |
+| pgAdmin      | [http://localhost:8081](http://localhost:8081)                                 |
 
 ---
 
@@ -603,6 +603,7 @@ sequenceDiagram
 |-------------------------------------------------------------|------------------------------------------------------|
 | [Estrutura do Projeto](docs/PROJECT_STRUCTURE.md)           | Detalhamento de cada camada e decisões arquiteturais |
 | [Padrões CQS & CQRS](docs/referencias/PATTERNS_CQS_CQRS.md) | Guia de arquitetura com exemplos e diagramas         |
+| [Modelagem de Dados](docs/DATA_MODEL.md)                    | Diagrama ER e Dicionário de Dados do banco relacional|
 | [curl-examples.sh](docs/curl-examples.sh)                   | Scripts prontos para testar todos os endpoints       |
 
 ---
