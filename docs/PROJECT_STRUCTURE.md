@@ -1,14 +1,14 @@
 # Estrutura do Projeto - MS Product Catalog
 
-Este documento descreve a estrutura de diretórios e arquivos do projeto `ms-product-catalog`, que segue os princípios de **Clean Architecture (Hexagonal)** e **Domain-Driven Design (DDD)**. O projeto foi desenvolvido com Java 21, Spring Boot 4.0.3 e MongoDB, utilizando código Java puro ("Vanilla") sem dependências de Lombok ou MapStruct.
+Este documento descreve a estrutura de diretórios e arquivos do projeto `ms-product-catalog`, que segue os princípios de **Clean Architecture (Hexagonal)** e **Domain-Driven Design (DDD)**. O projeto foi desenvolvido com Java 21, Spring Boot 4.0.3 e PostgreSQL, utilizando código Java puro ("Vanilla") sem dependências de Lombok ou MapStruct.
 
 ## Raiz do Projeto
 
 - **`build.gradle.kts` / `settings.gradle.kts`**: Gerenciamento de dependências e build com Gradle (Kotlin DSL). Versão do Spring Boot: `4.0.3`. Spring Cloud: `2025.1.0`. SpringDoc: `3.0.1`. ArchUnit: `1.4.1`.
 - **`gradlew` / `gradlew.bat`**: Wrapper do Gradle para execução sem instalação prévia. O checksum do `gradle-wrapper.jar` é validado automaticamente no pipeline de CI antes de qualquer compilação.
 - **`Dockerfile`**: Build multi-stage. Stage 1 usa `ghcr.io/graalvm/native-image-community:21.0.2` para compilar o binário nativo. Stage 2 usa `alpine:3.21.3` como imagem de runtime (~8 MB), sem JDK. O container é executado com usuário não-root (`appuser`).
-- **`compose.yml`**: Orquestração local de containers. Sobe MongoDB 8.0.11 e Mongo Express. O serviço `app` está comentado e pode ser descomentado para rodar o stack completo localmente.
-- **`.env`**: Arquivo de variáveis de ambiente para credenciais do MongoDB e Mongo Express. Listado em `.gitignore` e `.dockerignore` para evitar vazamento de segredos.
+- **`compose.yml`**: Orquestração local de containers. Sobe PostgreSQL 16.2 e pgAdmin. O serviço `app` está comentado e pode ser descomentado para rodar o stack completo localmente.
+- **`.env`**: Arquivo de variáveis de ambiente para credenciais do PostgreSQL e pgAdmin. Listado em `.gitignore` e `.dockerignore` para evitar vazamento de segredos.
 - **`.dockerignore`**: Exclui diretórios de build, IDEs, testes e arquivos de CI/CD da imagem Docker, reduzindo seu tamanho e evitando inclusão de segredos.
 - **`docs/`**: Documentação adicional do projeto.
   - **`curl-examples.sh`**: Scripts de exemplo para testar os endpoints da API via terminal.
@@ -102,12 +102,12 @@ Todos os casos de uso são POJOs puros que recebem o(s) Gateway(s) via construto
 
 ### 3. `infrastructure` (Infraestrutura)
 
-Implementações concretas das interfaces definidas no domínio e aplicação. Contém todas as dependências de frameworks (Spring, MongoDB Driver, SpringDoc).
+Implementações concretas das interfaces definidas no domínio e aplicação. Contém todas as dependências de frameworks (Spring, PostgreSQL Driver, SpringDoc).
 
 #### `config/` — Configurações Spring
 
 - **`UseCaseConfig.java`**: "Glue Code" da arquitetura hexagonal. Instancia todos os casos de uso (single e batch) como `@Bean`, injetando os respectivos Gateways.
-- **`MongoConfig.java`**: Habilita MongoDB Auditing.
+- **`JpaConfig.java`**: Habilita JPA Auditing.
 
 #### `adapter/input/` — Adaptadores Primários (Driving Adapters)
 
@@ -137,13 +137,13 @@ O projeto segue a segregação de responsabilidades de leitura e escrita (CQRS-L
 
 ##### `gateway/`
 
-- **`ProductMongoCommandAdapter.java`**: Implementação de `ProductCommandGateway`. Lida com inserção e atualização usando `ProductMongoRepository`.
-- **`ProductMongoQueryAdapter.java`**: Implementação de `ProductQueryGateway`. Lida com consultas usando traduções nativas (do `SearchQuery` do domínio para o `PageRequest` do Spring) e uso do `MongoTemplate` para queries complexas (regex).
+- **`ProductJpaCommandAdapter.java`**: Implementação de `ProductCommandGateway`. Lida com inserção e atualização usando `ProductJpaRepository`.
+- **`ProductJpaQueryAdapter.java`**: Implementação de `ProductQueryGateway`. Lida com consultas usando traduções nativas (do `SearchQuery` do domínio para query no repositório) e uso do repositório Spring Data JPA para buscas complexas.
 
 ##### `persistence/`
 
-- **`ProductDocument.java`**: Entidade `@Document` do MongoDB.
-- **`ProductMongoRepository.java`**: Interface `MongoRepository`.
+- **`ProductJpaEntity.java`**: Entidade `@Entity` do JPA/PostgreSQL.
+- **`ProductJpaRepository.java`**: Interface `JpaRepository`.
 
 #### `utils/`
 

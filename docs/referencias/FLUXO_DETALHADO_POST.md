@@ -114,22 +114,22 @@ Antes da primeira requisição chegar, o sistema prepara o terreno usando **Inve
 ---
 
 ## 5. Persistência: Decoupling com Gateway
-**Onde:** `infrastructure.adapter.output.gateway.ProductMongoAdapter`
+**Onde:** `infrastructure.adapter.output.gateway.ProductJpaCommandAdapter`
 
-*   **A Teoria (Inversão de Dependência):** O Caso de Uso depende de uma interface (`ProductGateway`). A implementação (`ProductMongoAdapter`) reside na infraestrutura. O adaptador converte o objeto de Domínio (`Product`) para o objeto de Persistência (`ProductDocument`).
+*   **A Teoria (Inversão de Dependência):** O Caso de Uso depende de uma interface (`ProductGateway`). A implementação (`ProductJpaCommandAdapter`) reside na infraestrutura. O adaptador converte o objeto de Domínio (`Product`) para o objeto de Persistência (`ProductJpaEntity`).
 *   **A Prática:**
     ```java
     @Component
-    public class ProductMongoAdapter implements ProductGateway {
+    public class ProductJpaCommandAdapter implements ProductGateway {
         @Override
         public Product create(final Product product) {
-            // Converte Domínio -> Documento Mongo
-            final var document = ProductDocument.from(product);
+            // Converte Domínio -> Entidade JPA
+            final var document = ProductJpaEntity.from(product);
             
             // Salva no Banco
             final var saved = this.repository.save(document);
             
-            // Converte Documento Mongo -> Domínio
+            // Converte Entidade JPA -> Domínio
             return saved.toEntity();
         }
     }
@@ -155,8 +155,8 @@ sequenceDiagram
     participant UC as DefaultCreateProductUseCase
     participant DOM as Product (Domain)
     participant VAL as ProductValidator
-    participant GW as ProductMongoAdapter
-    participant DB as MongoDB
+    participant GW as ProductJpaCommandAdapter
+    participant DB as PostgreSQL
 
     C->>CTRL: POST /products (JSON)
     Note right of C: Body mapeado para ProductRequest (Record)
@@ -180,9 +180,9 @@ sequenceDiagram
     else Success
         UC->>GW: create(Product)
         activate GW
-        GW->>GW: ProductDocument.from(Product)
-        GW->>DB: save(Document)
-        DB-->>GW: Saved Document
+        GW->>GW: ProductJpaEntity.from(Product)
+        GW->>DB: save(Entity)
+        DB-->>GW: Saved Entity
         GW->>GW: toEntity()
         GW-->>UC: Product (Persisted)
         deactivate GW

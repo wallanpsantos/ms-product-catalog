@@ -21,8 +21,8 @@
               too many constructor parameters (max 7). Example: use `ProductCommandController` (for POST/PUT/DELETE,
               injecting only mutation use cases) and `ProductQueryController` (for GET/Search, injecting only read
               use cases). Both can share the same base HTTP path.
-        - `adapter/output`: Driven adapters (e.g., `gateway/MongoCommandAdapter`, `persistence/MongoRepository`,
-          `persistence/Document`).
+        - `adapter/output`: Driven adapters (e.g., `gateway/JpaCommandAdapter`, `persistence/JpaRepository`,
+          `persistence/JpaEntity`).
         - `config`: Manual bean wiring for UseCases (e.g., `UseCaseConfig.java`) to keep application layer pure.
 
 - **SOLID in Practice**:

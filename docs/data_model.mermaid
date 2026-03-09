@@ -1,0 +1,82 @@
+erDiagram
+    %% Catálogo Básico
+    categories {
+        varchar id PK "UUID"
+        varchar name "not null"
+        varchar description
+        boolean active "not null"
+        timestamp created_at "not null"
+        timestamp updated_at
+    }
+
+    manufacturers {
+        varchar id PK "UUID"
+        varchar name "not null"
+        varchar country
+        boolean active "not null"
+        timestamp created_at "not null"
+        timestamp updated_at
+    }
+
+    products {
+        varchar id PK "UUID"
+        varchar category_id FK "UUID"
+        varchar manufacturer_id FK "UUID"
+        varchar name "not null"
+        varchar(1000) description "not null"
+        numeric price "not null"
+        boolean active "not null"
+        timestamp created_at "not null"
+        timestamp updated_at
+    }
+
+    %% Fornecedores e Aquisição
+    suppliers {
+        varchar id PK "UUID"
+        varchar name "not null"
+        varchar document_number "CNPJ/Tax ID - unique"
+        varchar contact_email
+        varchar contact_phone
+        boolean active "not null"
+        timestamp created_at "not null"
+        timestamp updated_at
+    }
+
+    product_suppliers {
+        varchar product_id FK, PK "UUID"
+        varchar supplier_id FK, PK "UUID"
+        numeric cost_price "not null"
+        int lead_time_days "Tempo de entrega"
+        boolean is_primary "not null, default false"
+    }
+
+    %% Estoque e Compras
+    inventory {
+        varchar id PK "UUID"
+        varchar product_id FK "UUID"
+        int available_quantity "not null, default 0"
+        int reserved_quantity "not null, default 0"
+        timestamp created_at "not null"
+        timestamp updated_at
+    }
+
+    reservations {
+        varchar id PK "UUID"
+        varchar product_id FK "UUID"
+        varchar external_order_id "UUID (referência a outro MS)"
+        int quantity "not null"
+        varchar status "PENDING, CONFIRMED, CANCELLED"
+        timestamp expires_at "not null"
+        timestamp created_at "not null"
+        timestamp updated_at
+    }
+
+    %% Relacionamentos
+    categories ||--o{ products : "possui"
+    manufacturers ||--o{ products : "fabrica"
+    
+    products ||--o{ product_suppliers : "fornecido por"
+    suppliers ||--o{ product_suppliers : "fornece"
+    
+    products ||--|| inventory : "controla"
+    products ||--o{ reservations : "recebe"

@@ -34,7 +34,7 @@ Microsserviço de **Catálogo de Produtos** desenvolvido com **Clean Architectur
 [![Build and Test](https://github.com/wallanpsantos/ms-product-catalog/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/wallanpsantos/ms-product-catalog/actions/workflows/build-and-test.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
-[![MongoDB](https://img.shields.io/badge/MongoDB-8.0-green?logo=mongodb)](https://www.mongodb.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.2-blue?logo=postgresql)](https://www.postgresql.org/)
 [![GraalVM](https://img.shields.io/badge/GraalVM-Native%20Image-orange)](https://www.graalvm.org/)
 [![Docker Compose](https://img.shields.io/badge/Docker%20Compose-blue?logo=docker)](https://docs.docker.com/compose/)
 [![Gradle](https://img.shields.io/badge/Gradle-9.3.1-blue?logo=gradle)](https://gradle.org/)
@@ -66,13 +66,13 @@ O `ms-product-catalog` é um microsserviço de catálogo de produtos que impleme
 |-----------------------|----------------------------------|-----------------------------|
 | Linguagem             | Java                             | 21                          |
 | Framework             | Spring Boot                      | 4.0.3                       |
-| Banco de Dados        | MongoDB                          | 8.0.11                      |
+| Banco de Dados        | PostgreSQL                       | 16.2                        |
 | Compilação Nativa     | GraalVM Native Image             | 21.0.2                      |
 | Resiliência           | Resilience4j (Circuit Breaker)   | 2025.1.0 (via Spring Cloud) |
 | Documentação API      | SpringDoc OpenAPI 3 (Swagger UI) | 3.0.1                       |
 | Análise de Qualidade  | SonarQube Cloud                  | —                           |
 | Testes Unitários      | JUnit + AssertJ + Mockito        | via Spring Boot + 3.27.7    |
-| Testes de Integração  | Testcontainers (MongoDB)         | via Spring Boot             |
+| Testes de Integração  | Testcontainers (PostgreSQL)      | via Spring Boot             |
 | Testes de API Externa | Contract Stub Runner (WireMock)  | 2025.1.0 (via Spring Cloud) |
 | Testes E2E            | REST Assured                     | 6.0.0                       |
 | Testes de Arquitetura | ArchUnit                         | 1.4.1                       |
@@ -106,14 +106,14 @@ cp .env.example .env  # ou crie manualmente
 ```
 
 ```env
-MONGO_ROOT_USERNAME=admin
-MONGO_ROOT_PASSWORD=change-me-in-production
-MONGO_DB_NAME=db-product-catalog
-MONGO_EXPRESS_USER=admin
-MONGO_EXPRESS_PASSWORD=change-me-in-production
+DB_USERNAME=admin
+DB_PASSWORD=change-me-in-production
+DB_NAME=db-product-catalog
+PGADMIN_USER=admin@admin.com
+PGADMIN_PASSWORD=change-me-in-production
 ```
 
-**3. Suba a infraestrutura (MongoDB + Mongo Express):**
+**3. Suba a infraestrutura (PostgreSQL + pgAdmin):**
 
 Com Docker:
 
@@ -181,7 +181,7 @@ Após iniciar a aplicação, acesse:
 | Swagger UI    | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
 | OpenAPI JSON  | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)         |
 | Health Check  | [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) |
-| Mongo Express | [http://localhost:8081](http://localhost:8081)                                 |
+| pgAdmin       | [http://localhost:8081](http://localhost:8081)                                 |
 
 ---
 
@@ -257,10 +257,10 @@ flowchart TB
     subgraph Infrastructure ["⚙️ Infrastructure"]
         Controller["ProductController\n(Driving Adapter)"]
 
-        subgraph Adapters ["MongoDB Adapters"]
+        subgraph Adapters ["JPA Adapters"]
             direction TB
-            CMD["ProductMongoCommandAdapter\nimplements ProductCommandGateway"]
-            QRY["ProductMongoQueryAdapter\nimplements ProductQueryGateway"]
+            CMD["ProductJpaCommandAdapter\nimplements ProductCommandGateway"]
+            QRY["ProductJpaQueryAdapter\nimplements ProductQueryGateway"]
         end
     end
 
@@ -284,7 +284,7 @@ flowchart TB
         AGG --> VAL
     end
 
-    DB[("🍃 MongoDB")]
+    DB[("🐘 PostgreSQL")]
     Controller --> Commands
     Controller --> Queries
     Commands --> CMD
@@ -292,7 +292,7 @@ flowchart TB
     CMD -->|" load / persist\nAggregate "| AGG
     CMD <-->|" INSERT / UPDATE "| DB
     QRY -->|" Domain Bypass\nProduct.java ignorado "| DB
-    DB -->|" ProductDocument\n→ ProductSummary (DTO) "| QRY
+    DB -->|" ProductJpaEntity\n→ ProductSummary (DTO) "| QRY
     style Domain fill: #1a3a5c, color: #fff, stroke: #4a9ede
     style Application fill: #1a4a2e, color: #fff, stroke: #4aaa6e
     style Infrastructure fill: #3a2a1a, color: #fff, stroke: #cc8844
@@ -310,14 +310,14 @@ flowchart TB
 sequenceDiagram
     participant API as Controller
     participant UC as GetProductById (Query)
-    participant GW as ProductMongoQueryAdapter
-    participant DB as MongoDB
+    participant GW as ProductJpaQueryAdapter
+    participant DB as PostgreSQL
     Note over UC, DB: DOMAIN BYPASS — Product.java nunca é instanciado
     API ->> UC: execute(Input)
     UC ->> GW: findSummaryById(id)
     GW ->> DB: findById(id)
-    DB -->> GW: ProductDocument
-    GW ->> GW: toSummary(Document)
+    DB -->> GW: ProductJpaEntity
+    GW ->> GW: toSummary(Entity)
     GW -->> UC: ProductSummary (DTO)
     UC -->> API: Output (DTO)
 ```
@@ -328,13 +328,13 @@ sequenceDiagram
 sequenceDiagram
     participant API as Controller
     participant UC as UpdateProduct (Command)
-    participant GW as ProductMongoCommandAdapter
+    participant GW as ProductJpaCommandAdapter
     participant Dom as Product (Aggregate)
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     API ->> UC: execute(Input)
     UC ->> GW: findById(id)
     GW ->> DB: findById(id)
-    DB -->> GW: Document
+    DB -->> GW: Entity
     GW -->> UC: Product (Entity)
     UC ->> Dom: update(dados)
     Dom ->> Dom: validate()
@@ -358,8 +358,8 @@ sequenceDiagram
     participant UC as DefaultCreateProductUseCase
     participant DOM as Product (Domain)
     participant VAL as ProductValidator
-    participant GW as ProductMongoCommandAdapter
-    participant DB as MongoDB
+    participant GW as ProductJpaCommandAdapter
+    participant DB as PostgreSQL
     C ->> CTRL: POST /products (JSON)
     CTRL ->> UC: execute(Input)
     UC ->> DOM: newProduct(...)
@@ -370,8 +370,8 @@ sequenceDiagram
         CTRL -->> C: 422 Unprocessable Entity
     else Success
         UC ->> GW: create(Product)
-        GW ->> DB: save(Document)
-        DB -->> GW: Saved Document
+        GW ->> DB: save(Entity)
+        DB -->> GW: Saved Entity
         GW -->> UC: Product (Persisted)
         UC -->> CTRL: Output(ID)
         CTRL -->> C: 201 Created + Location Header
@@ -391,7 +391,7 @@ sequenceDiagram
     participant UC as BatchUseCase
     participant DOM as Product
     participant GW as Gateway
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: POST /batch (List<Request>)
     CTRL ->> UC: execute(List<Input>)
     loop For each Item
@@ -402,8 +402,8 @@ sequenceDiagram
         end
     end
     UC ->> GW: createAll(List<Product>)
-    GW ->> DB: saveAll(List<Document>)
-    DB -->> GW: Saved Documents
+    GW ->> DB: saveAll(List<Entity>)
+    DB -->> GW: Saved Entities
     GW -->> UC: List<Product>
     UC -->> CTRL: List<Output>
     CTRL -->> C: 201 Created (List<Response>)
@@ -421,13 +421,13 @@ sequenceDiagram
     participant CTRL as Controller
     participant UC as GetByIdUseCase
     participant GW as QueryAdapter
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: GET /products/{id}
     CTRL ->> UC: execute(id)
     UC ->> GW: findSummaryById(id)
     GW ->> DB: findOne(id)
     alt Found
-        DB -->> GW: Document
+        DB -->> GW: Entity
         GW -->> UC: ProductSummary
         UC -->> CTRL: Output
         CTRL -->> C: 200 OK
@@ -450,12 +450,12 @@ sequenceDiagram
     participant CTRL as Controller
     participant UC as ListUseCase
     participant GW as QueryAdapter
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: GET /?page=0&perPage=10
     CTRL ->> UC: execute(Pageable)
     UC ->> GW: findAllActiveSummary(Pageable)
     GW ->> DB: find({active: true}).skip(0).limit(10)
-    DB -->> GW: List<Document>
+    DB -->> GW: List<Entity>
     GW -->> UC: Page<ProductSummary>
     UC -->> CTRL: Page<Output>
     CTRL -->> C: 200 OK (Page JSON)
@@ -474,7 +474,7 @@ sequenceDiagram
     participant UC as UpdateUseCase
     participant DOM as Product
     participant GW as CommandAdapter
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: PUT /products/{id}
     CTRL ->> UC: execute(Input)
     UC ->> GW: findById(id)
@@ -487,7 +487,7 @@ sequenceDiagram
         UC ->> DOM: update(fields...)
         UC ->> DOM: validate(Notification)
         UC ->> GW: update(Product)
-        GW ->> DB: save(Document)
+        GW ->> DB: save(Entity)
         UC -->> CTRL: Output(id)
         CTRL -->> C: 200 OK
     end
@@ -505,20 +505,20 @@ sequenceDiagram
     participant CTRL as Controller
     participant UC as BatchUpdateUC
     participant GW as CommandAdapter
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: PUT /batch (List<UpdateReq>)
     CTRL ->> UC: execute(List<Input>)
     Note right of UC: 1. Busca em Massa (evita N+1)
     UC ->> GW: findAllById(ids)
     GW ->> DB: find({_id: {$in: ids}})
-    DB -->> GW: List<Documents>
+    DB -->> GW: List<Entities>
     Note right of UC: 2. Processamento em Memória
     alt Missing IDs
         UC -->> CTRL: Throw NotFoundException
     else All Found
         UC ->> UC: Update & Validate (Loop)
         UC ->> GW: updateAll(List<Product>)
-        GW ->> DB: saveAll(Documents)
+        GW ->> DB: saveAll(Entities)
         GW -->> UC: List<Product>
         UC -->> CTRL: List<Output>
         CTRL -->> C: 200 OK
@@ -538,7 +538,7 @@ sequenceDiagram
     participant UC as DeactivateUC
     participant DOM as Product
     participant GW as CommandAdapter
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: DELETE /products/{id}
     CTRL ->> UC: execute(id)
     UC ->> GW: findById(id)
@@ -546,7 +546,7 @@ sequenceDiagram
         GW -->> UC: Product
         UC ->> DOM: deactivate()
         UC ->> GW: update(Product)
-        GW ->> DB: save(Document)
+        GW ->> DB: save(Entity)
         UC -->> CTRL: void
         CTRL -->> C: 204 No Content
     else Not Found
@@ -567,13 +567,13 @@ sequenceDiagram
     participant CTRL as Controller
     participant UC as SearchUseCase
     participant GW as QueryAdapter
-    participant DB as MongoDB
+    participant DB as PostgreSQL
     C ->> CTRL: POST /search (query="samsung")
     CTRL ->> UC: execute(Input)
     UC ->> GW: searchProductsSummary("samsung")
-    Note right of GW: Regex Case-Insensitive<br/>Campos: name, description, category, brand
+    Note right of GW: Like %<br/>Campos: name, description, category, brand
     GW ->> DB: find({ $or: [...], active: true })
-    DB -->> GW: List<Document>
+    DB -->> GW: List<Entity>
     GW -->> UC: List<ProductSummary>
     UC -->> CTRL: List<Output>
     CTRL -->> C: 200 OK (Results)

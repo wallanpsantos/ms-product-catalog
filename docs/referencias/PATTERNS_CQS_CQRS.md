@@ -60,22 +60,22 @@ Elevamos a segregação para um nível onde o lado de leitura **nunca** toca nas
 Todas as consultas (`GetById`, `List`, `Search`) utilizam o padrão **Domain Bypass**. O Gateway de leitura trabalha exclusivamente com DTOs de projeção (`ProductSummary`).
 
 *   **Interface:** `ProductQueryGateway` (Exclui Entidades de Domínio).
-*   **Adaptador:** `ProductMongoQueryAdapter` (Mapeia DB direto para DTO).
+*   **Adaptador:** `ProductJpaQueryAdapter` (Mapeia DB direto para DTO).
 
 ```mermaid
 sequenceDiagram
     participant API as Controller
     participant UC as GetProductById (Query)
-    participant GW as ProductMongoQueryAdapter
-    participant DB as MongoDB
+    participant GW as ProductJpaQueryAdapter
+    participant DB as PostgreSQL
 
     Note over UC, DB: DOMAIN BYPASS TOTAL (Product.java ignorado)
 
     API->>UC: execute(Input)
     UC->>GW: findSummaryById(id)
     GW->>DB: findById(id)
-    DB-->>GW: ProductDocument
-    GW->>GW: mapToSummary(Document)
+    DB-->>GW: ProductJpaEntity
+    GW->>GW: mapToSummary(Entity)
     GW-->>UC: ProductSummary (DTO)
     UC-->>API: Output (DTO)
 ```
@@ -87,19 +87,19 @@ O lado de escrita continua protegendo as regras de negócio através do Agregado
 sequenceDiagram
     participant API as Controller
     participant UC as UpdateProduct (Command)
-    participant GW_C as ProductMongoCommandAdapter
+    participant GW_C as ProductJpaCommandAdapter
     participant Dom as Product (Aggregate)
-    participant DB as MongoDB
+    participant DB as PostgreSQL
 
     API->>UC: execute(Input)
     UC->>GW_C: findById(id) -- carregar agregado
     GW_C->>DB: findById(id)
-    DB-->>GW_C: Document
+    DB-->>GW_C: Entity
     GW_C-->>UC: Product (Entity)
     UC->>Dom: update(dados) -- lógica rica
     Dom->>Dom: validate()
     UC->>GW_C: update(Product)
-    GW_C->>DB: save(Document)
+    GW_C->>DB: save(Entity)
     UC-->>API: Output (ID apenas)
 ```
 

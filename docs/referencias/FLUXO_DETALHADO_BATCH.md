@@ -36,7 +36,7 @@ sequenceDiagram
     participant MAP as RestMapper
     participant UC as BatchUseCase
     participant GW as ProductGateway
-    participant DB as MongoDB
+    participant DB as PostgreSQL
 
     C->>CTRL: PUT /batch (List<UpdateProductRequest>)
     
@@ -54,7 +54,7 @@ sequenceDiagram
     UC->>GW: findAllById(ids)
     activate GW
     GW->>DB: find({_id: {$in: ids}})
-    DB-->>GW: List<ProductDocument>
+    DB-->>GW: List<ProductJpaEntity>
     GW-->>UC: List<Product> (Existing)
     deactivate GW
     
@@ -101,4 +101,4 @@ sequenceDiagram
 *   **Camada de Aplicação:** `DefaultUpdateProductBatchUseCase`.
 *   **Complexidade de Rede:** O(1) (constante, independente do tamanho do lote).
 *   **Complexidade de CPU:** O(N) (linear, para processar a lista em memória).
-*   **Transacionalidade:** No MongoDB (sem Replica Set configurado), o `saveAll` pode não ser atômico por padrão (se falhar no meio, alguns salvam, outros não). Para garantir atomicidade total ("Tudo ou Nada"), é necessário habilitar Transações Multi-Documento no MongoDB Cluster. A lógica de aplicação garante "Tudo ou Nada" na etapa de **validação** (antes de salvar), mas erros de banco (ex: disco cheio no meio do batch) podem gerar estado parcial.
+*   **Transacionalidade:** O uso do repositório JPA provê suporte a transações por meio das anotações `@Transactional` no serviço ou de mecanismos transacionais configurados no Spring, garantindo atomicidade nas atualizações em lote para o banco relacional PostgreSQL.
