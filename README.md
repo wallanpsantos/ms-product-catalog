@@ -34,7 +34,7 @@ Microsserviço de **Catálogo de Produtos** desenvolvido com **Clean Architectur
 [![Build and Test](https://github.com/wallanpsantos/ms-product-catalog/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/wallanpsantos/ms-product-catalog/actions/workflows/build-and-test.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.2-blue?logo=postgresql)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.3-blue?logo=postgresql)](https://www.postgresql.org/)
 [![GraalVM](https://img.shields.io/badge/GraalVM-Native%20Image-orange)](https://www.graalvm.org/)
 [![Docker Compose](https://img.shields.io/badge/Docker%20Compose-blue?logo=docker)](https://docs.docker.com/compose/)
 [![Gradle](https://img.shields.io/badge/Gradle-9.3.1-blue?logo=gradle)](https://gradle.org/)
@@ -599,12 +599,12 @@ sequenceDiagram
 
 ## 📂 Documentação Adicional
 
-| Documento                                                   | Descrição                                            |
-|-------------------------------------------------------------|------------------------------------------------------|
-| [Estrutura do Projeto](docs/PROJECT_STRUCTURE.md)           | Detalhamento de cada camada e decisões arquiteturais |
-| [Padrões CQS & CQRS](docs/referencias/PATTERNS_CQS_CQRS.md) | Guia de arquitetura com exemplos e diagramas         |
-| [Modelagem de Dados](docs/DATA_MODEL.md)                    | Diagrama ER e Dicionário de Dados do banco relacional|
-| [curl-examples.sh](docs/curl-examples.sh)                   | Scripts prontos para testar todos os endpoints       |
+| Documento                                                   | Descrição                                             |
+|-------------------------------------------------------------|-------------------------------------------------------|
+| [Estrutura do Projeto](docs/PROJECT_STRUCTURE.md)           | Detalhamento de cada camada e decisões arquiteturais  |
+| [Padrões CQS & CQRS](docs/referencias/PATTERNS_CQS_CQRS.md) | Guia de arquitetura com exemplos e diagramas          |
+| [Modelagem de Dados](docs/database/DATA_MODEL.md)           | Diagrama ER e Dicionário de Dados do banco relacional |
+| [curl-examples.sh](docs/curl-examples.sh)                   | Scripts prontos para testar todos os endpoints        |
 
 ---
 
