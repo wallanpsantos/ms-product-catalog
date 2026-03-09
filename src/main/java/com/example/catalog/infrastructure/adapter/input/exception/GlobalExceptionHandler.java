@@ -4,6 +4,7 @@ import com.example.catalog.domain.exception.DomainException;
 import com.example.catalog.domain.exception.NotFoundException;
 import com.example.catalog.domain.validation.Error;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.response.ErrorResponse;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +31,7 @@ import java.time.LocalDateTime;
  * Mapeamentos principais:
  * <ul>
  *   <li>{@link NotFoundException} -> HTTP 404</li>
- *   <li>{@link DomainException} -> HTTP 422 (Unprocessable Entity)</li>
+ *   <li>{@link DomainException} -> HTTP 422 (Unprocessable Content)</li>
  *   <li>{@link MethodArgumentNotValidException} (Bean Validation) -> HTTP 422</li>
  *   <li>Outras Exceções -> HTTP 500</li>
  * </ul>
@@ -42,19 +43,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    public ResponseEntity<@NonNull Object> handleMethodArgumentNotValid(
             final MethodArgumentNotValidException ex,
-            final HttpHeaders headers,
-            final HttpStatusCode status,
-            final WebRequest request
+            final @NonNull HttpHeaders headers,
+            final @NonNull HttpStatusCode status,
+            final @NonNull WebRequest request
     ) {
         log.error("action=validationException fields={}", ex.getBindingResult().getFieldErrorCount());
         final var errors = ex.getBindingResult().getAllErrors().stream()
                 .map(this::convertError)
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY.value(), "Validation Error", errors, LocalDateTime.now()));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
+                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), "Validation Error", errors, LocalDateTime.now()));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -67,8 +68,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(final DomainException ex) {
         log.error("action=domainException message={}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage(), ex.getErrors(), LocalDateTime.now()));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
+                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), ex.getMessage(), ex.getErrors(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)
