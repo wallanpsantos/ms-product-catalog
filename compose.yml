@@ -13,6 +13,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-admin}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me-in-production}
       POSTGRES_DB: ${DB_NAME:-db-product-catalog}
+      PGDATA: /var/lib/postgresql/data/pgdata
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
