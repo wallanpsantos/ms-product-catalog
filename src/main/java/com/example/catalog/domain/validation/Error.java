@@ -1,8 +1,10 @@
 package com.example.catalog.domain.validation;
 
+import java.io.Serializable;
+
 /**
- * Represents a single validation error in the domain.
- * Used by {@link ValidationHandler} to accumulate errors (Notification Pattern).
+ * Representa um único erro de validação no domínio.
+ * Utilizado por {@link ValidationHandler} para acumular erros (Notification Pattern).
  */
-public record Error(String message) {
+public record Error(String message) implements Serializable {
 }
