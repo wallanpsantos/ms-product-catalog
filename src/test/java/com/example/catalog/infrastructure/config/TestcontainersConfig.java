@@ -23,7 +23,7 @@ public class TestcontainersConfig {
     // é gerenciado automaticamente pelo Spring Boot, que se encarregará do encerramento.
     @SuppressWarnings("resource")
     PostgreSQLContainer<?> postgresContainer() {
-        return new PostgreSQLContainer<>("postgres:16.2")
+        return new PostgreSQLContainer<>("postgres:18.3")
                 .withDatabaseName("db-product-catalog")
                 .withUsername("admin")
                 .withPassword("admin")
