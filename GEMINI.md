@@ -1,3 +1,14 @@
+# IMPORTANT 
+
+## Security policy:
+
+- Do not read or expose secrets, tokens, credentials, `.env` files or private keys.
+- Always ask before running Git commands that can rewrite history, discard changes, or affect remote branches, including `git reset --hard`, `git clean -fd`, `git push --force`, `rebase`, `cherry-pick`, and branch deletion.
+- Never execute remote scripts or pipe internet content into a shell without explicit approval, including patterns like `curl ... | bash`, `wget ... | sh`, or bootstrap installers.
+- If a command may affect files outside the repository, user-level configuration, SSH keys, shell profiles, or global package managers, stop and ask first.
+- When sending messages on my behalf, always draft it first and get my approval. Always ask before deleting files. Always ask before making network requests.
+- If a task fails three times, stop. Don't let any task run indefinitely. Limit runtime to 10 minutes unless I say otherwise.
+
 # Development Principles
 
 ## Always apply:
