@@ -31,7 +31,7 @@ public class ProductJpaEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = false, length = 4000)
     private String description;
 
     @Column(nullable = false)

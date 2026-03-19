@@ -5,7 +5,6 @@ import com.example.catalog.domain.validation.ValidationHandler;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * Raiz do Agregado de Produto (Aggregate Root).
@@ -184,15 +183,4 @@ public class Product extends Entity<ProductID> {
         return updatedAt;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Product product)) return false;
-        if (!super.equals(o)) return false;
-        return active == product.active && Objects.equals(name, product.name) && Objects.equals(description, product.description) && Objects.equals(category, product.category) && Objects.equals(brand, product.brand) && Objects.equals(price, product.price) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), name, description, category, brand, price, active, createdAt, updatedAt);
-    }
 }

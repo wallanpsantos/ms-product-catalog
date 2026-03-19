@@ -6,10 +6,7 @@ import com.example.catalog.application.port.input.SearchProductsUseCase;
 import com.example.catalog.domain.pagination.Pagination;
 import com.example.catalog.domain.pagination.SearchQuery;
 import com.example.catalog.infrastructure.adapter.input.rest.ProductQueryApi;
-import com.example.catalog.infrastructure.adapter.input.rest.dto.request.ProductRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.SearchRequest;
-import com.example.catalog.infrastructure.adapter.input.rest.dto.request.UpdateProductRequest;
-import com.example.catalog.infrastructure.adapter.input.rest.dto.response.CreateProductResponse;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.response.ProductResponse;
 import com.example.catalog.infrastructure.adapter.input.rest.mapper.ProductRestMapper;
 import org.springframework.http.ResponseEntity;
@@ -49,30 +46,10 @@ public class ProductQueryController implements ProductQueryApi {
         this.mapper = Objects.requireNonNull(mapper);
     }
 
-    public ResponseEntity<CreateProductResponse> createProduct(ProductRequest input) {
-        throw new UnsupportedOperationException("Commands are handled by ProductCommandController");
-    }
-
-    public ResponseEntity<List<CreateProductResponse>> createProductBatch(List<ProductRequest> input) {
-        throw new UnsupportedOperationException("Commands are handled by ProductCommandController");
-    }
-
     @Override
     public ResponseEntity<ProductResponse> getById(final String id) {
         final var output = getProductByIdUseCase.execute(new GetProductByIdUseCase.Input(id));
         return ResponseEntity.ok(mapper.toResponse(output));
-    }
-
-    public ResponseEntity<CreateProductResponse> updateProduct(String id, ProductRequest input) {
-        throw new UnsupportedOperationException("Commands are handled by ProductCommandController");
-    }
-
-    public ResponseEntity<List<CreateProductResponse>> updateProductBatch(List<UpdateProductRequest> input) {
-        throw new UnsupportedOperationException("Commands are handled by ProductCommandController");
-    }
-
-    public void deleteById(String id) {
-        throw new UnsupportedOperationException("Commands are handled by ProductCommandController");
     }
 
     @Override

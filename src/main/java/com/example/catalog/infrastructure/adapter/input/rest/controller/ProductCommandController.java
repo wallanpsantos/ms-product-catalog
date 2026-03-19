@@ -7,12 +7,9 @@ import com.example.catalog.application.port.input.UpdateProductBatchUseCase;
 import com.example.catalog.application.port.input.UpdateProductUseCase;
 import com.example.catalog.infrastructure.adapter.input.rest.ProductCommandApi;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.ProductRequest;
-import com.example.catalog.infrastructure.adapter.input.rest.dto.request.SearchRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.UpdateProductRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.response.CreateProductResponse;
-import com.example.catalog.infrastructure.adapter.input.rest.dto.response.ProductResponse;
 import com.example.catalog.infrastructure.adapter.input.rest.mapper.ProductRestMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,10 +74,6 @@ public class ProductCommandController implements ProductCommandApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    public ResponseEntity<ProductResponse> getById(final String id) {
-        throw new UnsupportedOperationException("Queries are handled by ProductQueryController");
-    }
-
     @Override
     public ResponseEntity<CreateProductResponse> updateProduct(final String id, final ProductRequest input) {
         final var output = updateProductUseCase.execute(mapper.toUpdateInput(id, input));
@@ -104,11 +97,4 @@ public class ProductCommandController implements ProductCommandApi {
         deactivateProductUseCase.execute(new DeactivateProductUseCase.Input(id));
     }
 
-    public ResponseEntity<Page<ProductResponse>> listProducts(int page, int perPage, String sort, String direction) {
-        throw new UnsupportedOperationException("Queries are handled by ProductQueryController");
-    }
-
-    public ResponseEntity<List<ProductResponse>> searchProducts(SearchRequest input) {
-        throw new UnsupportedOperationException("Queries are handled by ProductQueryController");
-    }
 }
