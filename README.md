@@ -156,7 +156,7 @@ Para compilar o executável nativo com startup ultrarrápido:
 
 ## 🧪 Testes
 
-Execute todos os testes (unitários + integração via Testcontainers):
+Execute todos os testes (unitários + API (Interna e Externa) + integração via Testcontainers):
 
 ```bash
 ./gradlew test
@@ -168,6 +168,12 @@ Execute apenas testes de arquitetura:
 
 ```bash
 ./gradlew test --tests "*ArchTest*"
+```
+
+Execute apenas testes de integração:
+
+```bash
+./gradlew test --tests "*IntegrationTest*"
 ```
 
 ---
