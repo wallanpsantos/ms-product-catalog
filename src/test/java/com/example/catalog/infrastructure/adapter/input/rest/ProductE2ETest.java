@@ -88,7 +88,7 @@ class ProductE2ETest {
     }
 
     @Test
-    @DisplayName("Deve atualizar um produto com sucesso e retornar 204")
+    @DisplayName("Deve atualizar um produto com sucesso e retornar 200")
     void shouldUpdateProductSuccessfully() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -113,7 +113,7 @@ class ProductE2ETest {
                 .when()
                 .put("/api/v1/products/" + id)
                 .then()
-                .statusCode(204);
+                .statusCode(200);
 
         // Then
         given()
@@ -225,7 +225,7 @@ class ProductE2ETest {
     }
 
     @Test
-    @DisplayName("Deve atualizar produtos em lote com sucesso e retornar 204")
+    @DisplayName("Deve atualizar produtos em lote com sucesso e retornar 200")
     void shouldUpdateProductBatchSuccessfully() {
         // Given
         String id1 = UUID.randomUUID().toString();
@@ -248,7 +248,7 @@ class ProductE2ETest {
                 .when()
                 .put("/api/v1/products/batch")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
 
         // Then
         given()
