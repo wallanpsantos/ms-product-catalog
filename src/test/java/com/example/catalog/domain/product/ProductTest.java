@@ -36,14 +36,15 @@ class ProductTest {
         );
 
         // Then
-        assertThat(actualProduct).isNotNull();
+        assertThat(actualProduct)
+                .isNotNull()
+                .returns(expectedName, Product::getName)
+                .returns(expectedDescription, Product::getDescription)
+                .returns(expectedCategory, Product::getCategory)
+                .returns(expectedBrand, Product::getBrand)
+                .returns(expectedPrice, Product::getPrice)
+                .returns(true, Product::isActive);
         assertThat(actualProduct.getId()).isNotNull();
-        assertThat(actualProduct.getName()).isEqualTo(expectedName);
-        assertThat(actualProduct.getDescription()).isEqualTo(expectedDescription);
-        assertThat(actualProduct.getCategory()).isEqualTo(expectedCategory);
-        assertThat(actualProduct.getBrand()).isEqualTo(expectedBrand);
-        assertThat(actualProduct.getPrice()).isEqualTo(expectedPrice);
-        assertThat(actualProduct.isActive()).isTrue();
         assertThat(actualProduct.getCreatedAt()).isNotNull();
         assertThat(actualProduct.getUpdatedAt()).isNotNull();
     }
@@ -136,15 +137,16 @@ class ProductTest {
         );
 
         // Then
-        assertThat(actualProduct).isNotNull();
-        assertThat(actualProduct.getId()).isEqualTo(expectedId);
-        assertThat(actualProduct.getName()).isEqualTo(expectedName);
-        assertThat(actualProduct.getDescription()).isEqualTo(expectedDescription);
-        assertThat(actualProduct.getCategory()).isEqualTo(expectedCategory);
-        assertThat(actualProduct.getBrand()).isEqualTo(expectedBrand);
-        assertThat(actualProduct.getPrice()).isEqualTo(expectedPrice);
-        assertThat(actualProduct.isActive()).isTrue();
-        assertThat(actualProduct.getCreatedAt()).isEqualTo(now);
-        assertThat(actualProduct.getUpdatedAt()).isEqualTo(now);
+        assertThat(actualProduct)
+                .isNotNull()
+                .returns(expectedId, Product::getId)
+                .returns(expectedName, Product::getName)
+                .returns(expectedDescription, Product::getDescription)
+                .returns(expectedCategory, Product::getCategory)
+                .returns(expectedBrand, Product::getBrand)
+                .returns(expectedPrice, Product::getPrice)
+                .returns(true, Product::isActive)
+                .returns(now, Product::getCreatedAt)
+                .returns(now, Product::getUpdatedAt);
     }
 }

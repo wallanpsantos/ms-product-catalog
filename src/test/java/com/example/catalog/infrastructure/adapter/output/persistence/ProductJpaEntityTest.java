@@ -56,15 +56,16 @@ class ProductJpaEntityTest {
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
 
-        assertThat(entity.getId()).isEqualTo("id");
-        assertThat(entity.getName()).isEqualTo("n");
-        assertThat(entity.getDescription()).isEqualTo("d");
-        assertThat(entity.getCategory()).isEqualTo("c");
-        assertThat(entity.getBrand()).isEqualTo("b");
-        assertThat(entity.getPrice()).isEqualTo(BigDecimal.ONE);
-        assertThat(entity.getActive()).isFalse();
-        assertThat(entity.getCreatedAt()).isEqualTo(now);
-        assertThat(entity.getUpdatedAt()).isEqualTo(now);
+        assertThat(entity)
+                .returns("id", ProductJpaEntity::getId)
+                .returns("n", ProductJpaEntity::getName)
+                .returns("d", ProductJpaEntity::getDescription)
+                .returns("c", ProductJpaEntity::getCategory)
+                .returns("b", ProductJpaEntity::getBrand)
+                .returns(BigDecimal.ONE, ProductJpaEntity::getPrice)
+                .returns(false, ProductJpaEntity::getActive)
+                .returns(now, ProductJpaEntity::getCreatedAt)
+                .returns(now, ProductJpaEntity::getUpdatedAt);
     }
 
     @Test
@@ -86,7 +87,8 @@ class ProductJpaEntityTest {
                 .isNotEqualTo(new Object())
                 .hasSameHashCodeAs(entity2);
 
-        assertThat(entity1.hashCode()).isNotEqualTo(entity3.hashCode());    }
+        assertThat(entity1.hashCode()).isNotEqualTo(entity3.hashCode());
+    }
 
     @Test
     @DisplayName("Deve testar toString")

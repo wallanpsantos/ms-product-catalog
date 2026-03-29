@@ -18,8 +18,9 @@ class NotificationTest {
         final var notification = Notification.create();
 
         // Then
-        assertThat(notification.hasError()).isFalse();
-        assertThat(notification.getErrors()).isEmpty();
+        assertThat(notification)
+                .returns(false, Notification::hasError)
+                .returns(true, n -> n.getErrors().isEmpty());
     }
 
     @Test

@@ -105,12 +105,14 @@
 
 ## Testing:
 
-## Testing:
-
 - Use the `@DisplayName` annotation in PT-BR to describe the expected behavior (e.g.,
   `@DisplayName("Deve buscar produto por ID com sucesso")`).
 - Always structure tests with BDD comments in English: Given, When e Then
 - Apply to all test types: unit, integration, external API and E2E
+- AssertJ: Use assertion chaining and the powerful `.returns()` method to validate multiple properties of the same
+  object within a single chain. This avoids multiple repeated `assertThat` calls, drastically reduces visual noise in
+  the code, and keeps the validation clean and precise. Example:
+  `assertThat(entity).returns("id", Entity::getId).returns("name", Entity::getName);`
 
 ## Codebase Rules:
 
