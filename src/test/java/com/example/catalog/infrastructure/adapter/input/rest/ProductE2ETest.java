@@ -2,6 +2,7 @@ package com.example.catalog.infrastructure.adapter.input.rest;
 
 import com.example.catalog.E2ETest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.ProductRequest;
+import com.example.catalog.infrastructure.adapter.input.rest.dto.request.UpdateProductRequest;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaEntity;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
 import io.restassured.RestAssured;
@@ -14,10 +15,12 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
 @E2ETest
@@ -85,6 +88,62 @@ class ProductE2ETest {
     }
 
     @Test
+    @DisplayName("Deve atualizar um produto com sucesso e retornar 204")
+    void shouldUpdateProductSuccessfully() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        repository.save(new ProductJpaEntity(
+                id,
+                "Monitor",
+                "Monitor 4k",
+                "Acessorios",
+                "LG",
+                new BigDecimal("1500.00"),
+                true,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        ));
+
+        ProductRequest request = new ProductRequest("Monitor Atualizado", "Monitor 8k", "Acessorios", "LG", new BigDecimal("2500.00"), false);
+
+        // When
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .put("/api/v1/products/" + id)
+                .then()
+                .statusCode(204);
+
+        // Then
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/products/" + id)
+                .then()
+                .statusCode(200)
+                .body("name", equalTo("Monitor Atualizado"))
+                .body("price", equalTo(2500.00f))
+                .body("active", equalTo(false));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 ao tentar atualizar um produto que nao existe")
+    void shouldReturn404WhenUpdatingNonExistentProduct() {
+        // Given
+        ProductRequest request = new ProductRequest("Monitor", "Monitor 4k", "Acessorios", "LG", new BigDecimal("1500.00"), true);
+
+        // When & Then
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .put("/api/v1/products/invalid-id")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
     @DisplayName("Deve buscar produto existente e retornar 200")
     void shouldReturn200WhenGettingExistingProduct() {
         // Given
@@ -145,5 +204,60 @@ class ProductE2ETest {
                 .then()
                 .statusCode(200)
                 .body("active", equalTo(false));
+    }
+
+    @Test
+    @DisplayName("Deve criar produtos em lote com sucesso e retornar 201")
+    void shouldCreateProductBatchSuccessfully() {
+        // Given
+        ProductRequest request1 = new ProductRequest("P1", "D1", "C1", "B1", new BigDecimal("10.00"), true);
+        ProductRequest request2 = new ProductRequest("P2", "D2", "C2", "B2", new BigDecimal("20.00"), true);
+
+        // When
+        given()
+                .contentType(ContentType.JSON)
+                .body(List.of(request1, request2))
+                .when()
+                .post("/api/v1/products/batch")
+                .then()
+                .statusCode(201)
+                .body("$", hasSize(2));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar produtos em lote com sucesso e retornar 204")
+    void shouldUpdateProductBatchSuccessfully() {
+        // Given
+        String id1 = UUID.randomUUID().toString();
+        String id2 = UUID.randomUUID().toString();
+
+        repository.save(new ProductJpaEntity(
+                id1, "P1", "D1", "C1", "B1", new BigDecimal("10.00"), true, LocalDateTime.now(), LocalDateTime.now()
+        ));
+        repository.save(new ProductJpaEntity(
+                id2, "P2", "D2", "C2", "B2", new BigDecimal("20.00"), true, LocalDateTime.now(), LocalDateTime.now()
+        ));
+
+        UpdateProductRequest req1 = new UpdateProductRequest(id1, "P1_UP", "D1", "C1", "B1", new BigDecimal("15.00"), true);
+        UpdateProductRequest req2 = new UpdateProductRequest(id2, "P2_UP", "D2", "C2", "B2", new BigDecimal("25.00"), true);
+
+        // When
+        given()
+                .contentType(ContentType.JSON)
+                .body(List.of(req1, req2))
+                .when()
+                .put("/api/v1/products/batch")
+                .then()
+                .statusCode(204);
+
+        // Then
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/products/" + id1)
+                .then()
+                .statusCode(200)
+                .body("name", equalTo("P1_UP"))
+                .body("price", equalTo(15.00f));
     }
 }
