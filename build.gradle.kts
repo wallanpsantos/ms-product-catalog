@@ -82,11 +82,26 @@ dependencyManagement {
     }
 }
 
+val coverageExcludes = listOf(
+    "com/example/catalog/infrastructure/config/**",
+    "com/example/catalog/infrastructure/adapter/input/rest/dto/**",
+    "com/example/catalog/infrastructure/adapter/input/rest/mapper/**",
+    "com/example/catalog/domain/exception/**",
+    "com/example/catalog/application/port/output/dto/**"
+)
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
         xml.required.set(true)
     }
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(coverageExcludes)
+            }
+        })
+    )
 }
 
 tasks.jacocoTestCoverageVerification {
@@ -98,6 +113,13 @@ tasks.jacocoTestCoverageVerification {
             }
         }
     }
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(coverageExcludes)
+            }
+        })
+    )
 }
 
 tasks.check {
@@ -109,6 +131,10 @@ sonarqube {
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml"
+        )
+        property(
+            "sonar.coverage.exclusions",
+            coverageExcludes.joinToString(",")
         )
     }
 }
