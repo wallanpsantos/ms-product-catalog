@@ -1,13 +1,18 @@
-# IMPORTANT 
+# IMPORTANT
 
 ## Security policy:
 
 - Do not read or expose secrets, tokens, credentials, `.env` files or private keys.
-- Always ask before running Git commands that can rewrite history, discard changes, or affect remote branches, including `git reset --hard`, `git clean -fd`, `git push --force`, `rebase`, `cherry-pick`, and branch deletion.
-- Never execute remote scripts or pipe internet content into a shell without explicit approval, including patterns like `curl ... | bash`, `wget ... | sh`, or bootstrap installers.
-- If a command may affect files outside the repository, user-level configuration, SSH keys, shell profiles, or global package managers, stop and ask first.
-- When sending messages on my behalf, always draft it first and get my approval. Always ask before deleting files. Always ask before making network requests.
-- If a task fails three times, stop. Don't let any task run indefinitely. Limit runtime to 10 minutes unless I say otherwise.
+- Always ask before running Git commands that can rewrite history, discard changes, or affect remote branches, including
+  `git reset --hard`, `git clean -fd`, `git push --force`, `rebase`, `cherry-pick`, and branch deletion.
+- Never execute remote scripts or pipe internet content into a shell without explicit approval, including patterns like
+  `curl ... | bash`, `wget ... | sh`, or bootstrap installers.
+- If a command may affect files outside the repository, user-level configuration, SSH keys, shell profiles, or global
+  package managers, stop and ask first.
+- When sending messages on my behalf, always draft it first and get my approval. Always ask before deleting files.
+  Always ask before making network requests.
+- If a task fails three times, stop. Don't let any task run indefinitely. Limit runtime to 20 minutes unless I say
+  otherwise.
 
 # Development Principles
 
@@ -94,7 +99,9 @@
 - **Methods**: single responsibility, max ~20 lines; extract logic with intention-revealing names
 - **Conditionals**: avoid negation (`!isInactive` -> `isActive`); no nested ifs — use early return / guard clauses
 - **Magic values**: no magic numbers or strings inline — extract to named constants
-- **Nulls**: never return or pass `null` (not even in case of validation failure or if there are no errors). Modern Java encourages the use of `Optional` to represent the absence of a value and thus avoid the dreaded `NullPointerException`. Use fail-fast in constructors.
+- **Nulls**: never return or pass `null` (not even in case of validation failure or if there are no errors). Modern Java
+  encourages the use of `Optional` to represent the absence of a value and thus avoid the dreaded
+  `NullPointerException`. Use fail-fast in constructors.
 
 ## Testing:
 
