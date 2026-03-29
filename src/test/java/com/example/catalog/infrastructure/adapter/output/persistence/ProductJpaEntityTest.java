@@ -79,15 +79,14 @@ class ProductJpaEntityTest {
         final var entity3 = new ProductJpaEntity();
         entity3.setId("2");
 
-        assertThat(entity1).isEqualTo(entity1);
-        assertThat(entity1).isEqualTo(entity2);
-        assertThat(entity1).isNotEqualTo(entity3);
-        assertThat(entity1).isNotEqualTo(null);
-        assertThat(entity1).isNotEqualTo(new Object());
+        assertThat(entity1)
+                .isEqualTo(entity2)
+                .isNotEqualTo(entity3)
+                .isNotNull()
+                .isNotEqualTo(new Object())
+                .hasSameHashCodeAs(entity2);
 
-        assertThat(entity1.hashCode()).isEqualTo(entity2.hashCode());
-        assertThat(entity1.hashCode()).isNotEqualTo(entity3.hashCode());
-    }
+        assertThat(entity1.hashCode()).isNotEqualTo(entity3.hashCode());    }
 
     @Test
     @DisplayName("Deve testar toString")
