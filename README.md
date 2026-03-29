@@ -62,22 +62,22 @@ O `ms-product-catalog` é um microsserviço de catálogo de produtos que impleme
 
 ## 🚀 Tecnologias
 
-| Categoria             | Tecnologia                       | Versão mínima               |
-|-----------------------|----------------------------------|-----------------------------|
-| Linguagem             | Java                             | 21                          |
-| Framework             | Spring Boot                      | 4.0.3                       |
-| Banco de Dados        | PostgreSQL                       | 18.3                        |
-| Compilação Nativa     | GraalVM Native Image             | 21.0.2                      |
-| Resiliência           | Resilience4j (Circuit Breaker)   | 2025.1.0 (via Spring Cloud) |
-| Documentação API      | SpringDoc OpenAPI 3 (Swagger UI) | 3.0.1                       |
-| Análise de Qualidade  | SonarQube Cloud                  | —                           |
-| Testes Unitários      | JUnit + AssertJ + Mockito        | via Spring Boot + 3.27.7    |
-| Testes de Integração  | Testcontainers (PostgreSQL)      | via Spring Boot             |
-| Testes de API Externa | Contract Stub Runner (WireMock)  | 2025.1.0 (via Spring Cloud) |
-| Testes E2E            | REST Assured                     | 6.0.0                       |
-| Testes de Arquitetura | ArchUnit                         | 1.4.1                       |
-| Cobertura de Código   | JaCoCo                           | via Gradle                  |
-| Build                 | Gradle (Kotlin DSL)              | 9.3.1                       |
+| Categoria             | Tecnologia                       | Versão mínima               | Obs.:                                                                                            |
+|-----------------------|----------------------------------|-----------------------------|--------------------------------------------------------------------------------------------------|
+| Linguagem             | Java                             | 21                          |                                                                                                  |
+| Framework             | Spring Boot                      | 4.0.3                       |                                                                                                  |
+| Banco de Dados        | PostgreSQL                       | 18.3                        |                                                                                                  |
+| Compilação Nativa     | GraalVM Native Image             | 21.0.2                      |                                                                                                  |
+| Resiliência           | Resilience4j (Circuit Breaker)   | 2025.1.0 (via Spring Cloud) |                                                                                                  |
+| Documentação API      | SpringDoc OpenAPI 3 (Swagger UI) | 3.0.1                       |                                                                                                  |
+| Análise de Qualidade  | SonarQube Cloud                  | —                           |                                                                                                  |
+| Testes Unitários      | JUnit + AssertJ + Mockito        | via Spring Boot + 3.27.7    | Para regras de negócio (Domain) e fluxos (UseCases).                                             |
+| Testes de Integração  | Testcontainers (PostgreSQL)      | via Spring Boot             | Para repositórios JPA (Persistence), <br/>garantindo que rodem no PostgreSQL via Testcontainers. |
+| Testes de API Externa | Contract Stub Runner (WireMock)  | 2025.1.0 (via Spring Cloud) |                                                                                                  |
+| Testes E2E            | REST Assured                     | 6.0.0                       | Para validar as chamadas na API Interna (Controllers)                                            |
+| Testes de Arquitetura | ArchUnit                         | 1.4.1                       |                                                                                                  |
+| Cobertura de Código   | JaCoCo                           | via Gradle                  |                                                                                                  |
+| Build                 | Gradle (Kotlin DSL)              | 9.3.1                       |                                                                                                  |
 
 ---
 
