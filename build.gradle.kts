@@ -83,11 +83,12 @@ dependencyManagement {
 }
 
 val coverageExcludes = listOf(
-    "com/example/catalog/infrastructure/config/**",
-    "com/example/catalog/infrastructure/adapter/input/rest/dto/**",
-    "com/example/catalog/infrastructure/adapter/input/rest/mapper/**",
-    "com/example/catalog/domain/exception/**",
-    "com/example/catalog/application/port/output/dto/**"
+    "**/catalog/infrastructure/config/**",
+    "**/catalog/infrastructure/adapter/input/rest/dto/**",
+    "**/catalog/infrastructure/adapter/input/rest/mapper/**",
+    "**/catalog/domain/exception/**",
+    "**/catalog/application/port/output/dto/**",
+    "**/catalog/infrastructure/utils/**"
 )
 
 tasks.jacocoTestReport {
