@@ -46,8 +46,9 @@ class DefaultUpdateProductBatchUseCaseTest {
         final var outputs = useCase.execute(List.of(input1, input2));
 
         // Then
-        assertThat(outputs).hasSize(2);
-        assertThat(outputs).extracting(UpdateProductUseCase.Output::id)
+        assertThat(outputs)
+                .hasSize(2)
+                .extracting(UpdateProductUseCase.Output::id)
                 .containsExactlyInAnyOrder(product1.getId().getValue(), product2.getId().getValue());
 
         verify(productGateway).findAllById(anyList());

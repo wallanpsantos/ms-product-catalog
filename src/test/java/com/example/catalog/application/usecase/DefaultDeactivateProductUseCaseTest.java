@@ -44,8 +44,11 @@ class DefaultDeactivateProductUseCaseTest {
         final var output = useCase.execute(input);
 
         // Then
-        assertThat(output).isNotNull();
-        assertThat(product.isActive()).isFalse();
+        assertThat(output)
+                .isNotNull();
+
+        assertThat(product)
+                .returns(false, Product::isActive);
 
         verify(productGateway).findById(any(ProductID.class));
         verify(productGateway).update(product);

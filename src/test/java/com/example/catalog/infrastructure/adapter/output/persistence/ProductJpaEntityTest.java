@@ -24,28 +24,32 @@ class ProductJpaEntityTest {
         final var mappedProduct = entity.toEntity();
 
         // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getId()).isEqualTo(product.getId().getValue());
-        assertThat(entity.getName()).isEqualTo(product.getName());
-        assertThat(entity.getDescription()).isEqualTo(product.getDescription());
-        assertThat(entity.getCategory()).isEqualTo(product.getCategory());
-        assertThat(entity.getBrand()).isEqualTo(product.getBrand());
-        assertThat(entity.getPrice()).isEqualTo(product.getPrice());
-        assertThat(entity.getActive()).isEqualTo(product.isActive());
-        assertThat(entity.getCreatedAt()).isEqualTo(product.getCreatedAt());
-        assertThat(entity.getUpdatedAt()).isEqualTo(product.getUpdatedAt());
+        assertThat(entity)
+                .isNotNull()
+                .returns(product.getId().getValue(), ProductJpaEntity::getId)
+                .returns(product.getName(), ProductJpaEntity::getName)
+                .returns(product.getDescription(), ProductJpaEntity::getDescription)
+                .returns(product.getCategory(), ProductJpaEntity::getCategory)
+                .returns(product.getBrand(), ProductJpaEntity::getBrand)
+                .returns(product.getPrice(), ProductJpaEntity::getPrice)
+                .returns(product.isActive(), ProductJpaEntity::getActive)
+                .returns(product.getCreatedAt(), ProductJpaEntity::getCreatedAt)
+                .returns(product.getUpdatedAt(), ProductJpaEntity::getUpdatedAt);
 
-        assertThat(mappedProduct).isNotNull();
-        assertThat(mappedProduct.getId()).isEqualTo(product.getId());
-        assertThat(mappedProduct.getName()).isEqualTo(product.getName());
+        assertThat(mappedProduct)
+                .isNotNull()
+                .returns(product.getId(), Product::getId)
+                .returns(product.getName(), Product::getName);
     }
 
     @Test
     @DisplayName("Deve testar getters e setters")
     void givenEntity_whenSetProperties_thenShouldGetCorrectly() {
+        // Given
         final var entity = new ProductJpaEntity();
         final var now = LocalDateTime.now();
 
+        // When
         entity.setId("id");
         entity.setName("n");
         entity.setDescription("d");
@@ -56,6 +60,7 @@ class ProductJpaEntityTest {
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
 
+        // Then
         assertThat(entity)
                 .returns("id", ProductJpaEntity::getId)
                 .returns("n", ProductJpaEntity::getName)
@@ -71,6 +76,7 @@ class ProductJpaEntityTest {
     @Test
     @DisplayName("Deve testar equals e hashCode")
     void givenEntities_whenCompare_thenShouldReturnCorrectly() {
+        // Given
         final var entity1 = new ProductJpaEntity();
         entity1.setId("1");
 
@@ -80,6 +86,7 @@ class ProductJpaEntityTest {
         final var entity3 = new ProductJpaEntity();
         entity3.setId("2");
 
+        // When / Then
         assertThat(entity1)
                 .isEqualTo(entity2)
                 .isNotEqualTo(entity3)
@@ -93,8 +100,14 @@ class ProductJpaEntityTest {
     @Test
     @DisplayName("Deve testar toString")
     void givenEntity_whenToString_thenShouldReturnString() {
+        // Given
         final var entity = new ProductJpaEntity();
         entity.setId("1");
-        assertThat(entity.toString()).contains("id='1'");
+
+        // When
+        final var result = entity.toString();
+
+        // Then
+        assertThat(result).contains("id='1'");
     }
 }

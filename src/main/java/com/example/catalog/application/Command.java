@@ -13,8 +13,8 @@ package com.example.catalog.application;
  * fique isolada da lógica de apresentação, permitindo otimizações independentes.
  * </p>
  *
- * @param <IN>  Dados necessários para executar a ação (ex: DTO de criação).
- * @param <OUT> Resultado mínimo da operação (ex: ID).
+ * @param <I> Dados necessários para executar a ação (ex: DTO de criação).
+ * @param <O> Resultado mínimo da operação (ex: ID).
  */
-public abstract class Command<IN, OUT> extends UseCase<IN, OUT> {
+public abstract class Command<I, O> extends UseCase<I, O> {
 }

@@ -37,14 +37,15 @@ class DefaultGetProductByIdUseCaseIntegrationTest {
         final var output = getProductByIdUseCase.execute(input);
 
         // Then
-        assertThat(output).isNotNull();
-        assertThat(output.id()).isEqualTo(createdId);
-        assertThat(output.name()).isEqualTo("Notebook Pro");
-        assertThat(output.description()).isEqualTo("Notebook de alta performance");
-        assertThat(output.category()).isEqualTo("Eletrônicos");
-        assertThat(output.brand()).isEqualTo("TechBrand");
+        assertThat(output)
+                .isNotNull()
+                .returns(createdId, GetProductByIdUseCase.Output::id)
+                .returns("Notebook Pro", GetProductByIdUseCase.Output::name)
+                .returns("Notebook de alta performance", GetProductByIdUseCase.Output::description)
+                .returns("Eletrônicos", GetProductByIdUseCase.Output::category)
+                .returns("TechBrand", GetProductByIdUseCase.Output::brand)
+                .returns(true, GetProductByIdUseCase.Output::active);
         assertThat(output.price()).isEqualByComparingTo(BigDecimal.valueOf(4999.90));
-        assertThat(output.active()).isTrue();
         assertThat(output.createdAt()).isNotNull();
         assertThat(output.updatedAt()).isNotNull();
     }

@@ -2,6 +2,7 @@ package com.example.catalog.infrastructure.adapter.input.rest;
 
 import com.example.catalog.E2ETest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.ProductRequest;
+import com.example.catalog.infrastructure.adapter.input.rest.dto.request.SearchRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.UpdateProductRequest;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaEntity;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
@@ -259,5 +260,79 @@ class ProductE2ETest {
                 .statusCode(200)
                 .body("name", equalTo("P1_UP"))
                 .body("price", equalTo(15.00f));
+    }
+
+    @Test
+    @DisplayName("Deve listar produtos ativos com paginacao com sucesso e retornar 200")
+    void shouldListProductsWithPaginationSuccessfully() {
+        // Given
+        repository.deleteAll();
+        repository.save(new ProductJpaEntity(
+                UUID.randomUUID().toString(), "Teclado", "Mecanico", "Acessorios", "Logitech", new BigDecimal("500.00"), true, LocalDateTime.now(), LocalDateTime.now()
+        ));
+        repository.save(new ProductJpaEntity(
+                UUID.randomUUID().toString(), "Mouse", "Sem fio", "Acessorios", "Logitech", new BigDecimal("300.00"), true, LocalDateTime.now(), LocalDateTime.now()
+        ));
+        repository.save(new ProductJpaEntity(
+                UUID.randomUUID().toString(), "Mouse Inativo", "Com fio", "Acessorios", "Multilaser", new BigDecimal("50.00"), false, LocalDateTime.now(), LocalDateTime.now()
+        ));
+
+        // When & Then
+        given()
+                .contentType(ContentType.JSON)
+                .queryParam("page", 0)
+                .queryParam("perPage", 10)
+                .queryParam("sort", "name")
+                .queryParam("dir", "asc")
+                .when()
+                .get("/api/v1/products")
+                .then()
+                .statusCode(200)
+                .body("currentPage", equalTo(0))
+                .body("perPage", equalTo(10))
+                .body("total", equalTo(2)) // Only 2 active products
+                .body("items", hasSize(2));
+    }
+
+    @Test
+    @DisplayName("Deve buscar produtos por termo (query) com sucesso e retornar 200")
+    void shouldSearchProductsSuccessfully() {
+        // Given
+        repository.deleteAll();
+        repository.save(new ProductJpaEntity(
+                UUID.randomUUID().toString(), "Teclado Redragon", "Mecanico", "Acessorios", "Redragon", new BigDecimal("500.00"), true, LocalDateTime.now(), LocalDateTime.now()
+        ));
+        repository.save(new ProductJpaEntity(
+                UUID.randomUUID().toString(), "Mouse Razer", "Sem fio", "Acessorios", "Razer", new BigDecimal("300.00"), true, LocalDateTime.now(), LocalDateTime.now()
+        ));
+
+        SearchRequest request = new SearchRequest("Redragon");
+
+        // When & Then
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/products/search")
+                .then()
+                .statusCode(200)
+                .body("$", hasSize(1))
+                .body("[0].name", equalTo("Teclado Redragon"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 422 ao buscar produtos com query vazia")
+    void shouldReturn422WhenSearchingWithBlankQuery() {
+        // Given
+        SearchRequest request = new SearchRequest("");
+
+        // When & Then
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/products/search")
+                .then()
+                .statusCode(422);
     }
 }
