@@ -1,0 +1,4 @@
+# Garante que scripts bash e hooks sempre usem LF
+git-hooks/pre-push text eol=lf
+git-hooks/install-hooks.sh text eol=lf
+.git/hooks/pre-push text eol=lf
