@@ -43,6 +43,8 @@ import java.time.LocalDateTime;
  * </ol>
  * </p>
  */
+@SuppressWarnings("java:S2160")
+// Subclasses de Entity não devem sobrescrever equals; a identidade é baseada apenas no ID.
 public class Product extends Entity<ProductID> {
 
     private String name;
