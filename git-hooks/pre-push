@@ -1,0 +1,12 @@
+#!/bin/sh
+# Pre-push hook Gradle cross-platform para Spring Boot Java 21
+DIR=$(git rev-parse --show-toplevel)
+
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+if [[ "$OS" =~ msys|cygwin|mingw ]]; then
+  # Windows: chama PowerShell
+  exec powershell.exe -ExecutionPolicy Bypass -File "$DIR/git-hooks/pre-push.ps1"
+else
+  # Linux/macOS: Gradle direto
+  exec "$DIR/gradlew" clean build -x test
+fi
