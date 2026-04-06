@@ -1,8 +1,7 @@
 # MS Product Catalog
 
 Microsserviço de **Catálogo de Produtos** desenvolvido com **Clean Architecture**, **DDD**, **Hexagonal Architecture**,
-**SOLID** e os Padrões
-**CQS (Command Query Separation)** e **CQRS (Command Query Responsibility Segregation)**.
+**SOLID** e o padrão arquitetural **CQRS-Lite (Command Query Responsibility Segregation)**.
 
 ✨ **Foco**: Separação estrita de responsabilidades, inversão de dependência e domínio desacoplado da infraestrutura.
 
