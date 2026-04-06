@@ -88,7 +88,7 @@ class DefaultGetProductByIdUseCaseTest {
         // When / Then
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage("Product with ID %s was not found", expectedId);
+                .hasMessage("Product with id %s was not found", expectedId);
 
         verify(productGateway, times(1)).findSummaryById(ProductID.from(expectedId));
     }

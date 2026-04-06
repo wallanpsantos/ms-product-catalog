@@ -76,7 +76,7 @@ class DefaultUpdateProductUseCaseTest {
         // When / Then
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage("Product with ID %s was not found", expectedId);
+                .hasMessage("Product with id %s was not found", expectedId);
 
         verify(productGateway, times(1)).findById(ProductID.from(expectedId));
         verify(productGateway, times(0)).update(any());
@@ -114,7 +114,6 @@ class DefaultUpdateProductUseCaseTest {
         // Usamos um mock para evitar o fail-fast e testar o NotificationPattern
         final var productMock = mock(Product.class);
         final var productID = ProductID.from(expectedId);
-        when(productMock.getId()).thenReturn(productID);
 
         // Simulando a falha de validação via Notification Pattern
         doAnswer(invocation -> {

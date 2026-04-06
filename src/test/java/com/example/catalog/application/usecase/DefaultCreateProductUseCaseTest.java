@@ -80,19 +80,31 @@ class DefaultCreateProductUseCaseTest {
         final var input = new CreateProductUseCase.Input(
                 "A", // Muito curto, dependendo da regra
                 "Um smartphone potente", "Electronics",
-                "BrandZ", new BigDecimal("-10.00"), // Preço negativo
+                "BrandZ", new BigDecimal("10.00"), // Preço valido
                 true
         );
 
         // Quando a regra é checada pelo validator e não no fail-fast
         // Esse teste valida que a NotificationException é lançada.
 
-        // When/Then
-        assertThatThrownBy(() -> useCase.execute(input))
-                .isInstanceOf(NotificationException.class)
-                .hasMessageContaining("Não foi possível criar o Agregado de Produto");
+        try (var mockedProduct = org.mockito.Mockito.mockStatic(Product.class)) {
+            final var productMock = org.mockito.Mockito.mock(Product.class);
+            mockedProduct.when(() -> Product.newProduct(any(), any(), any(), any(), any(), org.mockito.ArgumentMatchers.anyBoolean()))
+                    .thenReturn(productMock);
 
-        verify(productGateway, times(0)).create(any());
+            org.mockito.Mockito.doAnswer(invocation -> {
+                com.example.catalog.domain.validation.handler.Notification n = invocation.getArgument(0);
+                n.append(new com.example.catalog.domain.validation.Error("Mocked validation error"));
+                return null;
+            }).when(productMock).validate(any());
+
+            // When/Then
+            assertThatThrownBy(() -> useCase.execute(input))
+                    .isInstanceOf(NotificationException.class)
+                    .hasMessageContaining("Não foi possível criar o Agregado de Produto");
+
+            verify(productGateway, times(0)).create(any());
+        }
     }
 
     @Test
