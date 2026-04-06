@@ -44,10 +44,11 @@ class DefaultListActiveProductsUseCaseTest {
         final var result = useCase.execute(query);
 
         // Then
-        assertThat(result).isNotNull();
-        assertThat(result.currentPage()).isEqualTo(expectedPagination.currentPage());
-        assertThat(result.perPage()).isEqualTo(expectedPagination.perPage());
-        assertThat(result.total()).isEqualTo(expectedPagination.total());
+        assertThat(result)
+                .isNotNull()
+                .returns(expectedPagination.currentPage(), Pagination::currentPage)
+                .returns(expectedPagination.perPage(), Pagination::perPage)
+                .returns(expectedPagination.total(), Pagination::total);
         assertThat(result.items()).hasSize(1);
 
         final var output = result.items().getFirst();

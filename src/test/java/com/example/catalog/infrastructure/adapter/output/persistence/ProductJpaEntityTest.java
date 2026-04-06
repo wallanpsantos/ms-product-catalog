@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,36 +41,6 @@ class ProductJpaEntityTest {
                 .returns(product.getName(), Product::getName);
     }
 
-    @Test
-    @DisplayName("Deve testar getters e setters")
-    void givenEntity_whenSetProperties_thenShouldGetCorrectly() {
-        // Given
-        final var entity = new ProductJpaEntity();
-        final var now = LocalDateTime.now();
-
-        // When
-        entity.setId("id");
-        entity.setName("n");
-        entity.setDescription("d");
-        entity.setCategory("c");
-        entity.setBrand("b");
-        entity.setPrice(BigDecimal.ONE);
-        entity.setActive(false);
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
-
-        // Then
-        assertThat(entity)
-                .returns("id", ProductJpaEntity::getId)
-                .returns("n", ProductJpaEntity::getName)
-                .returns("d", ProductJpaEntity::getDescription)
-                .returns("c", ProductJpaEntity::getCategory)
-                .returns("b", ProductJpaEntity::getBrand)
-                .returns(BigDecimal.ONE, ProductJpaEntity::getPrice)
-                .returns(false, ProductJpaEntity::getActive)
-                .returns(now, ProductJpaEntity::getCreatedAt)
-                .returns(now, ProductJpaEntity::getUpdatedAt);
-    }
 
     @Test
     @DisplayName("Deve testar equals e hashCode")

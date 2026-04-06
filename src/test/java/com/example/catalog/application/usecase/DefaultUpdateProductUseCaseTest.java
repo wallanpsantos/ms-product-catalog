@@ -8,6 +8,8 @@ import com.example.catalog.domain.exception.NotFoundException;
 import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.domain.product.Product;
 import com.example.catalog.domain.product.ProductID;
+import com.example.catalog.domain.validation.Error;
+import com.example.catalog.domain.validation.handler.Notification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -113,12 +115,11 @@ class DefaultUpdateProductUseCaseTest {
 
         // Usamos um mock para evitar o fail-fast e testar o NotificationPattern
         final var productMock = mock(Product.class);
-        final var productID = ProductID.from(expectedId);
 
         // Simulando a falha de validação via Notification Pattern
         doAnswer(invocation -> {
-            com.example.catalog.domain.validation.handler.Notification notification = invocation.getArgument(0);
-            notification.append(new com.example.catalog.domain.validation.Error("Preço não pode ser negativo"));
+            Notification notification = invocation.getArgument(0);
+            notification.append(new Error("Preço não pode ser negativo"));
             return null;
         }).when(productMock).validate(any());
 

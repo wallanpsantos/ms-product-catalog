@@ -4,7 +4,7 @@ import com.example.catalog.E2ETest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.ProductRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.SearchRequest;
 import com.example.catalog.infrastructure.adapter.input.rest.dto.request.UpdateProductRequest;
-import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaEntity;
+import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaEntityFixture;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,6 +52,7 @@ class ProductE2ETest {
                 .post("/api/v1/products")
                 .then()
                 .statusCode(201)
+                .header("Location", org.hamcrest.Matchers.containsString("/api/v1/products/"))
                 .body("id", notNullValue())
                 .extract().path("id");
 
@@ -93,17 +93,7 @@ class ProductE2ETest {
     void shouldUpdateProductSuccessfully() {
         // Given
         String id = UUID.randomUUID().toString();
-        repository.save(new ProductJpaEntity(
-                id,
-                "Monitor",
-                "Monitor 4k",
-                "Acessorios",
-                "LG",
-                new BigDecimal("1500.00"),
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        ));
+        repository.save(ProductJpaEntityFixture.active(id, "Monitor"));
 
         ProductRequest request = new ProductRequest("Monitor Atualizado", "Monitor 8k", "Acessorios", "LG", new BigDecimal("2500.00"), false);
 
@@ -149,17 +139,7 @@ class ProductE2ETest {
     void shouldReturn200WhenGettingExistingProduct() {
         // Given
         String id = UUID.randomUUID().toString();
-        repository.save(new ProductJpaEntity(
-                id,
-                "Monitor",
-                "Monitor 4k",
-                "Acessorios",
-                "LG",
-                new BigDecimal("1500.00"),
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        ));
+        repository.save(ProductJpaEntityFixture.active(id, "Monitor"));
 
         // When & Then
         given()
@@ -177,17 +157,7 @@ class ProductE2ETest {
     void shouldDeactivateProductSuccessfully() {
         // Given
         String id = UUID.randomUUID().toString();
-        repository.save(new ProductJpaEntity(
-                id,
-                "Cadeira",
-                "Cadeira Ergonômica",
-                "Moveis",
-                "Herman Miller",
-                new BigDecimal("5000.00"),
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        ));
+        repository.save(ProductJpaEntityFixture.active(id, "Cadeira"));
 
         // When & Then
         given()
@@ -232,12 +202,8 @@ class ProductE2ETest {
         String id1 = UUID.randomUUID().toString();
         String id2 = UUID.randomUUID().toString();
 
-        repository.save(new ProductJpaEntity(
-                id1, "P1", "D1", "C1", "B1", new BigDecimal("10.00"), true, LocalDateTime.now(), LocalDateTime.now()
-        ));
-        repository.save(new ProductJpaEntity(
-                id2, "P2", "D2", "C2", "B2", new BigDecimal("20.00"), true, LocalDateTime.now(), LocalDateTime.now()
-        ));
+        repository.save(ProductJpaEntityFixture.active(id1, "P1"));
+        repository.save(ProductJpaEntityFixture.active(id2, "P2"));
 
         UpdateProductRequest req1 = new UpdateProductRequest(id1, "P1_UP", "D1", "C1", "B1", new BigDecimal("15.00"), true);
         UpdateProductRequest req2 = new UpdateProductRequest(id2, "P2_UP", "D2", "C2", "B2", new BigDecimal("25.00"), true);
@@ -267,15 +233,9 @@ class ProductE2ETest {
     void shouldListProductsWithPaginationSuccessfully() {
         // Given
         repository.deleteAll();
-        repository.save(new ProductJpaEntity(
-                UUID.randomUUID().toString(), "Teclado", "Mecanico", "Acessorios", "Logitech", new BigDecimal("500.00"), true, LocalDateTime.now(), LocalDateTime.now()
-        ));
-        repository.save(new ProductJpaEntity(
-                UUID.randomUUID().toString(), "Mouse", "Sem fio", "Acessorios", "Logitech", new BigDecimal("300.00"), true, LocalDateTime.now(), LocalDateTime.now()
-        ));
-        repository.save(new ProductJpaEntity(
-                UUID.randomUUID().toString(), "Mouse Inativo", "Com fio", "Acessorios", "Multilaser", new BigDecimal("50.00"), false, LocalDateTime.now(), LocalDateTime.now()
-        ));
+        repository.save(ProductJpaEntityFixture.active(UUID.randomUUID().toString(), "Teclado"));
+        repository.save(ProductJpaEntityFixture.active(UUID.randomUUID().toString(), "Mouse"));
+        repository.save(ProductJpaEntityFixture.inactive(UUID.randomUUID().toString()));
 
         // When & Then
         given()
@@ -299,12 +259,8 @@ class ProductE2ETest {
     void shouldSearchProductsSuccessfully() {
         // Given
         repository.deleteAll();
-        repository.save(new ProductJpaEntity(
-                UUID.randomUUID().toString(), "Teclado Redragon", "Mecanico", "Acessorios", "Redragon", new BigDecimal("500.00"), true, LocalDateTime.now(), LocalDateTime.now()
-        ));
-        repository.save(new ProductJpaEntity(
-                UUID.randomUUID().toString(), "Mouse Razer", "Sem fio", "Acessorios", "Razer", new BigDecimal("300.00"), true, LocalDateTime.now(), LocalDateTime.now()
-        ));
+        repository.save(ProductJpaEntityFixture.active(UUID.randomUUID().toString(), "Teclado Redragon"));
+        repository.save(ProductJpaEntityFixture.active(UUID.randomUUID().toString(), "Mouse Razer"));
 
         SearchRequest request = new SearchRequest("Redragon");
 
@@ -334,5 +290,55 @@ class ProductE2ETest {
                 .post("/api/v1/products/search")
                 .then()
                 .statusCode(422);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 ao buscar produto inexistente")
+    void shouldReturn404WhenGettingNonExistentProduct() {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/products/" + UUID.randomUUID())
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 ao deletar produto inexistente")
+    void shouldReturn404WhenDeletingNonExistentProduct() {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("/api/v1/products/" + UUID.randomUUID())
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 no batch update quando algum ID não existe")
+    void shouldReturn404WhenBatchUpdateHasMissingId() {
+        UpdateProductRequest req = new UpdateProductRequest(UUID.randomUUID().toString(), "P", "D", "C", "B", BigDecimal.TEN, true);
+        given()
+                .contentType(ContentType.JSON)
+                .body(List.of(req))
+                .when()
+                .put("/api/v1/products/batch")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando nenhum produto corresponde à busca")
+    void shouldReturnEmptyListWhenSearchHasNoMatches() {
+        repository.deleteAll();
+        SearchRequest request = new SearchRequest("NaoExiste");
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/api/v1/products/search")
+                .then()
+                .statusCode(200)
+                .body("$", hasSize(0));
     }
 }

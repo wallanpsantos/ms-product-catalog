@@ -4,8 +4,12 @@ import com.example.catalog.application.NullaryUseCase;
 import com.example.catalog.application.UseCase;
 import com.example.catalog.application.port.output.ProductCommandGateway;
 import com.example.catalog.application.port.output.ProductQueryGateway;
+import com.example.catalog.domain.Entity;
+import com.example.catalog.domain.Identifier;
+import com.example.catalog.domain.ValueObject;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.core.importer.Location;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -56,7 +60,9 @@ public class ArchitectureTest {
         public boolean includes(Location location) {
             return !location.contains("__TestContext") &&
                     !location.contains("$$Spring") &&
-                    !location.contains("CGLIB");
+                    !location.contains("CGLIB") &&
+                    !location.contains("__BeanDefinitions") &&
+                    !location.contains("__BeanFactoryRegistrations");
         }
     }
 
@@ -335,4 +341,72 @@ public class ArchitectureTest {
             .that().resideInAPackage("..infrastructure.adapter.input.rest.mapper..")
             .should().haveSimpleNameEndingWith("Mapper")
             .as("Classes de mapeamento devem terminar com 'Mapper' e residir no pacote correto");
+
+    /**
+     * Garante que os Controllers não chamem os Gateways (portas de saída) diretamente.
+     * Os Controllers devem orquestrar regras usando apenas os Use Cases (portas de entrada).
+     */
+    @ArchTest
+    static final ArchRule controllersShouldNotDependOnGateways = noClasses()
+            .that().resideInAPackage("..infrastructure.adapter.input.rest.controller..")
+            .should().dependOnClassesThat().implement(ProductCommandGateway.class)
+            .orShould().dependOnClassesThat().implement(ProductQueryGateway.class)
+            .because("Controllers orquestram via Use Cases; nunca chamam Gateways diretamente");
+
+    /**
+     * Isola as camadas centrais da Arquitetura Hexagonal.
+     * O Domínio e os Use Cases devem ser agnósticos a infraestrutura e a frameworks externos como o Spring.
+     */
+    @ArchTest
+    static final ArchRule domainAndApplicationShouldNotDependOnSpring = noClasses()
+            .that().resideInAnyPackage("..domain..", "..application..")
+            .should().dependOnClassesThat().resideInAPackage("org.springframework..")
+            .because("Camadas de Domínio e Aplicação devem ser puras, agnósticas a framework e sem anotações como @Transactional, @Service ou @Component");
+
+    /**
+     * Impõe o uso de constructs idiomáticas modernas (Java 21+) para objetos de valor.
+     * Value Objects não têm identidade e são puramente baseados em seus valores estruturais (imutáveis).
+     */
+    @ArchTest
+    static final ArchRule valueObjectsShouldBeRecords = classes()
+            .that().implement(ValueObject.class)
+            .and().areNotAssignableTo(Identifier.class)
+            .should(new ArchCondition<JavaClass>("ser records") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    boolean isRecord = item.isRecord();
+                    events.add(new SimpleConditionEvent(item, isRecord,
+                            item.getDescription() + (isRecord ? " é um record" : " deveria ser um record")));
+                }
+            })
+            .allowEmptyShould(true)
+            .because("Value Objects são imutáveis por definição; records são a construção idiomática no Java 21+");
+
+    /**
+     * Organiza as classes responsáveis pelo tratamento global de exceções na API.
+     */
+    @ArchTest
+    static final ArchRule exceptionHandlersShouldBeInCorrectPackage = classes()
+            .that().areAnnotatedWith("org.springframework.web.bind.annotation.RestControllerAdvice")
+            .should().resideInAPackage("..infrastructure.adapter.input.exception..")
+            .because("Handlers globais de exceção devem estar no pacote de exception da infraestrutura");
+
+    /**
+     * Protege as invariantes das Entidades de Domínio impedindo instanciação arbitrária.
+     * O construtor é restrito; as entidades só podem ser criadas via Factory Methods explícitos.
+     */
+    @ArchTest
+    static final ArchRule domainEntitiesShouldNotHavePublicConstructors = noClasses()
+            .that().resideInAPackage("..domain.product..")
+            .and().areAssignableTo(Entity.class)
+            .should(new ArchCondition<JavaClass>("ter construtor público") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    boolean hasPublicConstructor = item.getConstructors().stream()
+                            .anyMatch(c -> c.getModifiers().contains(JavaModifier.PUBLIC));
+                    events.add(new SimpleConditionEvent(item, hasPublicConstructor,
+                            item.getDescription() + (hasPublicConstructor ? " tem construtor público" : " não tem construtor público")));
+                }
+            })
+            .because("Entidades de domínio devem ser instanciadas via factory methods (newProduct, with)");
 }
