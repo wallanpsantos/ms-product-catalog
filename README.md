@@ -78,7 +78,7 @@ O `ms-product-catalog` é um microsserviço de catálogo de produtos que impleme
 | Cobertura de Código   | JaCoCo                           | via Gradle                  |                                                                                                  |
 | Build                 | Gradle (Kotlin DSL)              | 9.3.1                       |                                                                                                  |
 
-## 🚀 Setup Inicial (OBRIGATÓRIO para TODOS)
+## 🚀 Setup Inicial (OBRIGATÓRIO)
 
 Após `git clone` ou primeiro `git pull`:
 

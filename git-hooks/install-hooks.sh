@@ -1,12 +1,15 @@
-#!/bin/sh
-DIR=$(git rev-parse --show-toplevel)
+﻿#!/bin/bash
+# Instalador de hooks corrigido (remove \r se existir)
+DIR="$(git rev-parse --show-toplevel | tr -d '\r')"
 
-echo "🚀 Instalando pre-push hook Gradle cross-platform..."
+echo "ðŸš€ Instalando pre-push hook Gradle..."
 
+# Copia e garante que o script bash e ps1 estejam no lugar
 cp "$DIR/git-hooks/pre-push"     "$DIR/.git/hooks/pre-push"
 cp "$DIR/git-hooks/pre-push.ps1" "$DIR/.git/hooks/pre-push.ps1"
+
+# Torna executÃ¡vel
 chmod +x "$DIR/.git/hooks/pre-push"
 
-echo "✅ INSTALADO! Teste com: git push"
-echo "💡 Pular hook: git push --no-verify"
-echo "⚠️  Requisitos: Java 21 no PATH"
+echo "âœ… INSTALADO com sucesso!"
+echo "Teste agora com: git push"
