@@ -16,30 +16,22 @@
 
 # Development Principles
 
-## Always apply:
+## Clean Code & Maintenance (Scout Rule):
 
-- **Architecture (Strict Clean/Hexagonal Architecture)**:
-    - **Dependency Rule**: Source code dependencies MUST strictly point inwards:
-      `infrastructure -> application -> domain`.
-    - **domain layer**: Pure Java/business logic only.
-        - Contains business entities extending base `Entity` / `ValueObject` / `Identifier`.
-        - Contains `Validator` and `Notification` patterns for domain rule validation (`AssertionConcern`).
-        - ZERO framework dependencies (no Spring, no `@Entity`, no `@Document`).
-    - **application layer**: Use cases and Ports.
-        - `port/input`: Interfaces for UseCases (e.g., `CreateProductUseCase`).
-        - `port/output`: Gateway interfaces separated by Command and Query (e.g., `CommandGateway`, `QueryGateway`).
-        - `usecase`: Default implementations of the input ports (e.g., `DefaultCreateProductUseCase`). No `@Service`
-          annotations here.
-    - **infrastructure layer**: The outermost layer (Spring Boot territory).
-        - `adapter/input`: Driving adapters (e.g., `rest/controller`, `rest/dto`, `GlobalExceptionHandler`).
-            - **Controller Segregation (CQRS-Lite)**: Strictly separate read (Queries) and write (Commands)
-              operations into distinct controllers to adhere to SRP, ISP, and avoid Sonar/Checkstyle warnings for
-              too many constructor parameters (max 7). Example: use `ProductCommandController` (for POST/PUT/DELETE,
-              injecting only mutation use cases) and `ProductQueryController` (for GET/Search, injecting only read
-              use cases). Both can share the same base HTTP path.
-        - `adapter/output`: Driven adapters (e.g., `gateway/JpaCommandAdapter`, `persistence/JpaRepository`,
-          `persistence/JpaEntity`).
-        - `config`: Manual bean wiring for UseCases (e.g., `UseCaseConfig.java`) to keep application layer pure.
+- **DRY**: remove duplication when changing code
+- **Names**: rename bad names you touch
+- **Simplicity**: smaller methods, direct flow, no over-engineering
+- **Maintainability**: readability, split responsibilities, tests, remove dead code
+- **Methods**: single responsibility, max ~20 lines; extract logic with intention-revealing names
+- **Conditionals**: avoid negation (`!isInactive` -> `isActive`); no nested ifs — use early return / guard clauses
+- **Magic values**: no magic numbers or strings inline — extract to named constants
+- **Nulls**: never return or pass `null` (not even in case of validation failure or if there are no errors). Modern Java
+  encourages the use of `Optional` to represent the absence of a value and thus avoid the dreaded
+  `NullPointerException`. Use fail-fast in constructors.
+- **Imports**: avoid Fully Qualified Names (FQN) in logic; always use explicit imports at the top of the file to keep
+  the code body clean and readable.
+
+## Always apply:
 
 - **SOLID in Practice**:
     - **S (Single Responsibility)**: each class/method has one reason to change; split when a class handles more than
@@ -90,18 +82,30 @@
       HATEOAS).
     - Constraint: Never use RPC-style endpoints (e.g., /user/create) or custom HTTP verbs.
 
-## Clean Code & Maintenance (Scout Rule):
+## Architecture
 
-- **DRY**: remove duplication when changing code
-- **Names**: rename bad names you touch
-- **Simplicity**: smaller methods, direct flow, no over-engineering
-- **Maintainability**: readability, split responsibilities, tests, remove dead code
-- **Methods**: single responsibility, max ~20 lines; extract logic with intention-revealing names
-- **Conditionals**: avoid negation (`!isInactive` -> `isActive`); no nested ifs — use early return / guard clauses
-- **Magic values**: no magic numbers or strings inline — extract to named constants
-- **Nulls**: never return or pass `null` (not even in case of validation failure or if there are no errors). Modern Java
-  encourages the use of `Optional` to represent the absence of a value and thus avoid the dreaded
-  `NullPointerException`. Use fail-fast in constructors.
+- **Architecture (Strict Clean/Hexagonal Architecture)**:
+    - **Dependency Rule**: Source code dependencies MUST strictly point inwards:
+      `infrastructure -> application -> domain`.
+    - **domain layer**: Pure Java/business logic only.
+        - Contains business entities extending base `Entity` / `ValueObject` / `Identifier`.
+        - Contains `Validator` and `Notification` patterns for domain rule validation (`AssertionConcern`).
+        - ZERO framework dependencies (no Spring, no `@Entity`, no `@Document`).
+    - **application layer**: Use cases and Ports.
+        - `port/input`: Interfaces for UseCases (e.g., `CreateProductUseCase`).
+        - `port/output`: Gateway interfaces separated by Command and Query (e.g., `CommandGateway`, `QueryGateway`).
+        - `usecase`: Default implementations of the input ports (e.g., `DefaultCreateProductUseCase`). No `@Service`
+          annotations here.
+    - **infrastructure layer**: The outermost layer (Spring Boot territory).
+        - `adapter/input`: Driving adapters (e.g., `rest/controller`, `rest/dto`, `GlobalExceptionHandler`).
+            - **Controller Segregation (CQRS-Lite)**: Strictly separate read (Queries) and write (Commands)
+              operations into distinct controllers to adhere to SRP, ISP, and avoid Sonar/Checkstyle warnings for
+              too many constructor parameters (max 7). Example: use `ProductCommandController` (for POST/PUT/DELETE,
+              injecting only mutation use cases) and `ProductQueryController` (for GET/Search, injecting only read
+              use cases). Both can share the same base HTTP path.
+        - `adapter/output`: Driven adapters (e.g., `gateway/JpaCommandAdapter`, `persistence/JpaRepository`,
+          `persistence/JpaEntity`).
+        - `config`: Manual bean wiring for UseCases (e.g., `UseCaseConfig.java`) to keep application layer pure.
 
 ## Testing:
 

@@ -1,17 +1,27 @@
 package com.example.catalog;
 
+import com.example.catalog.application.NullaryUseCase;
+import com.example.catalog.application.UseCase;
+import com.example.catalog.application.port.output.ProductCommandGateway;
+import com.example.catalog.application.port.output.ProductQueryGateway;
 import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.core.importer.Location;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.lang.conditions.ArchConditions;
 
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleNameEndingWith;
 import static com.tngtech.archunit.core.domain.JavaModifier.ABSTRACT;
 import static com.tngtech.archunit.lang.conditions.ArchConditions.haveModifier;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
@@ -71,6 +81,14 @@ public class ArchitectureTest {
 
     // --- REGRAS DE PUREZA (WHITELIST) ---
 
+    @ArchTest
+    static final ArchRule domainShouldNotHaveJakartaPersistenceAnnotations = noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().beAnnotatedWith("jakarta.persistence.Entity")
+            .orShould().beAnnotatedWith("jakarta.persistence.Table")
+            .orShould().beAnnotatedWith("jakarta.persistence.Column")
+            .because("Entidades de domínio não devem ter dependências de persistência");
+
     /**
      * Garante que o Domínio seja 100% puro.
      * Abordagem Whitelist: Só permite Java padrão, o próprio pacote domain e anotações de contrato.
@@ -123,6 +141,13 @@ public class ArchitectureTest {
 
     // --- REGRAS DE USE CASES E CQRS ---
 
+    @ArchTest
+    static final ArchRule useCasesShouldNotBeAnnotatedWithSpringStereotypes = classes()
+            .that().resideInAPackage("..application.usecase..")
+            .should().notBeAnnotatedWith("org.springframework.stereotype.Service")
+            .andShould().notBeAnnotatedWith("org.springframework.stereotype.Component")
+            .because("Use cases são POJOs puros instanciados via UseCaseConfig; não devem depender do Spring");
+
     /**
      * Valida o local de residência de Use Cases.
      * Devem estar em 'port.input' (contrato abstrato) ou 'usecase' (implementação concreta).
@@ -130,8 +155,8 @@ public class ArchitectureTest {
     @ArchTest
     static final ArchRule useCasesShouldBeInCorrectPackages = classes()
             .that().haveSimpleNameEndingWith("UseCase")
-            .and(DescribedPredicate.not(equivalentTo(com.example.catalog.application.UseCase.class)))
-            .and(DescribedPredicate.not(equivalentTo(com.example.catalog.application.NullaryUseCase.class)))
+            .and(DescribedPredicate.not(equivalentTo(UseCase.class)))
+            .and(DescribedPredicate.not(equivalentTo(NullaryUseCase.class)))
             .should().resideInAnyPackage(
                     "..application.port.input..",
                     "..application.usecase.."
@@ -147,7 +172,14 @@ public class ArchitectureTest {
             .that().resideInAPackage("..application.port.input..")
             .and().haveSimpleNameEndingWith("UseCase")
             .should(haveModifier(ABSTRACT))
-            .andShould().beAssignableTo(com.example.catalog.application.UseCase.class)
+            .andShould(new ArchCondition<JavaClass>("herdar de UseCase ou NullaryUseCase") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    boolean assignable = item.isAssignableTo(UseCase.class) ||
+                            item.isAssignableTo(NullaryUseCase.class);
+                    events.add(new SimpleConditionEvent(item, assignable, item.getDescription() + (assignable ? " herda de UseCase ou NullaryUseCase" : " não herda de UseCase ou NullaryUseCase")));
+                }
+            })
             .as("As portas de entrada (Input Ports) devem ser classes abstratas");
 
     /**
@@ -174,6 +206,27 @@ public class ArchitectureTest {
             .as("Todas as classes de nível superior nos pacotes de Use Case devem terminar com o sufixo 'UseCase'");
 
     // --- REGRAS DE ADAPTADORES E PERSISTÊNCIA ---
+
+    @ArchTest
+    static final ArchRule commandAdaptersShouldImplementCommandGateway = classes()
+            .that().resideInAPackage("..infrastructure.adapter.output.gateway..")
+            .and().haveSimpleNameContaining("Command")
+            .should().implement(ProductCommandGateway.class)
+            .because("Adaptadores de Command devem implementar o gateway de escrita correspondente");
+
+    @ArchTest
+    static final ArchRule queryAdaptersShouldImplementQueryGateway = classes()
+            .that().resideInAPackage("..infrastructure.adapter.output.gateway..")
+            .and().haveSimpleNameContaining("Query")
+            .should().implement(ProductQueryGateway.class)
+            .because("Adaptadores de Query devem implementar o gateway de leitura correspondente");
+
+    @ArchTest
+    static final ArchRule controllersShouldImplementApiInterface = classes()
+            .that().haveSimpleNameEndingWith("Controller")
+            .and().resideInAPackage("..infrastructure.adapter.input.rest.controller..")
+            .should().implement(simpleNameEndingWith("Api"))
+            .because("Controllers devem implementar a interface de contrato de API correspondente");
 
     /**
      * Garante que os Controllers REST estejam isolados no seu adaptador de entrada.
