@@ -78,40 +78,6 @@ O `ms-product-catalog` é um microsserviço de catálogo de produtos que impleme
 | Cobertura de Código   | JaCoCo                           | via Gradle                  |                                                                                                  |
 | Build                 | Gradle (Kotlin DSL)              | 9.3.1                       |                                                                                                  |
 
-## 🚀 Setup Inicial (OBRIGATÓRIO)
-
-Após `git clone` ou primeiro `git pull`:
-
-### 🟢 Linux/macOS:
-
-```bash
-bash git-hooks/install-hooks.sh
-```
-
-### 🟡 Windows:
-
-| Terminal                        | Comando                                                                                                         |
-|---------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| **Git Bash** (VS Code/IntelliJ) | `bash git-hooks/install-hooks.sh`                                                                               |
-| **PowerShell**                  | `bash.exe ./git-hooks/install-hooks.sh` <br> *(Se erro: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`)* |
-| **CMD**                         | `bash git-hooks\install-hooks.sh` <br> *Ou:* `"C:\Program Files\Git\bin\bash.exe" git-hooks\install-hooks.sh`   |
-
-### ✅ Verificar Instalação:
-
-```bash
-ls -la .git/hooks/pre-push*  # Linux/macOS
-dir .git\hooks\pre-push*     # Windows
-```
-
-## 🎯 O Que Acontece Agora:
-
-- ✅ `git commit` normal
-- 🔄 `git push` → executa `./gradlew clean build -x test` **local**
-- ❌ Build falha → **push bloqueado**
-- 💡 Emergência: `git push --no-verify`
-
-**Requisitos:** Java 21 no PATH de todos devs.
-
 ---
 
 ## 🛠️ Instalação e Execução
