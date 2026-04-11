@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,8 +43,8 @@ class DefaultGetProductByIdUseCaseTest {
         final var expectedBrand = "BrandX";
         final var expectedPrice = new BigDecimal("4999.99");
         final var expectedActive = true;
-        final var expectedCreatedAt = LocalDateTime.now();
-        final var expectedUpdatedAt = LocalDateTime.now();
+        final var expectedCreatedAt = Instant.now();
+        final var expectedUpdatedAt = Instant.now();
 
         final var input = new GetProductByIdUseCase.Input(expectedId);
 

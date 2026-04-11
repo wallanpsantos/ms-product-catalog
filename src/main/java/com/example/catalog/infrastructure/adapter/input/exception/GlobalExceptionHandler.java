@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Interceptador global de exceções da API.
@@ -55,21 +55,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .toList();
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
-                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), "Validation Error", errors, LocalDateTime.now()));
+                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), "Validation Error", errors, Instant.now()));
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(final NotFoundException ex) {
         log.error("action=notFoundException message={}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), LocalDateTime.now()));
+                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), Instant.now()));
     }
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(final DomainException ex) {
         log.error("action=domainException message={}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
-                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), ex.getMessage(), ex.getErrors(), LocalDateTime.now()));
+                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), ex.getMessage(), ex.getErrors(), Instant.now()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -77,7 +77,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("action=unexpectedException message={}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "An unexpected error occurred", LocalDateTime.now()));
+                        "An unexpected error occurred", Instant.now()));
     }
 
     private Error convertError(final ObjectError error) {

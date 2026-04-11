@@ -1,7 +1,7 @@
 package com.example.catalog.infrastructure.adapter.input.rest.dto.response;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * DTO de Resposta completo para um Produto.
@@ -19,7 +19,7 @@ public record ProductResponse(
         String brand,
         BigDecimal price,
         boolean active,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

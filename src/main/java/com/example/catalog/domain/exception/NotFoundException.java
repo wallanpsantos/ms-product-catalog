@@ -2,6 +2,8 @@ package com.example.catalog.domain.exception;
 
 import com.example.catalog.domain.validation.Error;
 
+import static java.util.List.of;
+
 /**
  * Sinaliza que um recurso solicitado não foi encontrado.
  * <p>
@@ -12,7 +14,7 @@ import com.example.catalog.domain.validation.Error;
 public class NotFoundException extends DomainException {
 
     private NotFoundException(final String message) {
-        super(message, java.util.List.of(new Error(message)));
+        super(message, of(new Error(message)));
     }
 
     public static NotFoundException with(final Class<?> clazz, final String id) {

@@ -4,7 +4,7 @@ import com.example.catalog.domain.Entity;
 import com.example.catalog.domain.validation.ValidationHandler;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Raiz do Agregado de Produto (Aggregate Root).
@@ -53,8 +53,8 @@ public class Product extends Entity<ProductID> {
     private String brand;
     private BigDecimal price;
     private boolean active;
-    private final LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     @SuppressWarnings("java:S107") // Reconstitution requires all fields
     private Product(
@@ -65,8 +65,8 @@ public class Product extends Entity<ProductID> {
             final String brand,
             final BigDecimal price,
             final boolean active,
-            final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final Instant createdAt,
+            final Instant updatedAt
     ) {
         super(id);
         this.assertArgumentNotEmpty(name, "'name' should not be empty or null");
@@ -99,7 +99,7 @@ public class Product extends Entity<ProductID> {
             final BigDecimal price,
             final boolean active
     ) {
-        final var now = LocalDateTime.now();
+        final var now = Instant.now();
         return new Product(ProductID.unique(), name, description, category, brand, price, active, now, now);
     }
 
@@ -112,8 +112,8 @@ public class Product extends Entity<ProductID> {
             final String brand,
             final BigDecimal price,
             final boolean active,
-            final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final Instant createdAt,
+            final Instant updatedAt
     ) {
         return new Product(id, name, description, category, brand, price, active, createdAt, updatedAt);
     }
@@ -140,12 +140,12 @@ public class Product extends Entity<ProductID> {
         this.brand = brand;
         this.price = price;
         this.active = active;
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 
     public void deactivate() {
         this.active = false;
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 
     @Override
@@ -177,11 +177,11 @@ public class Product extends Entity<ProductID> {
         return active;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 

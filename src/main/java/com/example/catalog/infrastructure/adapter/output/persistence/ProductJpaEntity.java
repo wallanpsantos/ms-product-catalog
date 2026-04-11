@@ -10,7 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -48,17 +48,17 @@ public class ProductJpaEntity {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     public ProductJpaEntity() {
     }
 
     @SuppressWarnings("java:S107")
-    public ProductJpaEntity(String id, String name, String description, String category, String brand, BigDecimal price, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ProductJpaEntity(String id, String name, String description, String category, String brand, BigDecimal price, Boolean active, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -154,19 +154,19 @@ public class ProductJpaEntity {
         this.active = active;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

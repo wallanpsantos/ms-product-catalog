@@ -3,7 +3,7 @@ package com.example.catalog.application.port.input;
 import com.example.catalog.application.Query;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Porta de Entrada para buscar um produto pelo seu Identificador único.
@@ -26,8 +26,8 @@ public abstract class GetProductByIdUseCase
             String brand,
             BigDecimal price,
             boolean active,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            Instant createdAt,
+            Instant updatedAt
     ) {
     }
 }

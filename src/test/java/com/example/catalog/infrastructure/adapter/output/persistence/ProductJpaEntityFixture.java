@@ -1,7 +1,7 @@
 package com.example.catalog.infrastructure.adapter.output.persistence;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class ProductJpaEntityFixture {
 
@@ -10,7 +10,7 @@ public class ProductJpaEntityFixture {
 
     public static ProductJpaEntity active(final String id, final String name) {
         return new ProductJpaEntity(id, name, "Desc", "Cat", "Brand",
-                new BigDecimal("100.00"), true, LocalDateTime.now(), LocalDateTime.now());
+                new BigDecimal("100.00"), true, Instant.now(), Instant.now());
     }
 
     public static ProductJpaEntity inactive(final String id) {
@@ -19,6 +19,6 @@ public class ProductJpaEntityFixture {
 
     public static ProductJpaEntity inactive(final String id, final String name) {
         return new ProductJpaEntity(id, name, "Desc", "Cat", "Brand",
-                new BigDecimal("100.00"), false, LocalDateTime.now(), LocalDateTime.now());
+                new BigDecimal("100.00"), false, Instant.now(), Instant.now());
     }
 }

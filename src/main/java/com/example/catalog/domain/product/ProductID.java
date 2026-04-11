@@ -11,7 +11,7 @@ import java.util.UUID;
  * Usuário onde se espera um ID de Produto (Primitive Obsession).
  * </p>
  */
-public class ProductID extends Identifier {
+public final class ProductID extends Identifier {
 
     private final String value;
 

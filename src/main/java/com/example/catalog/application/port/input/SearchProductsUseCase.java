@@ -3,7 +3,7 @@ package com.example.catalog.application.port.input;
 import com.example.catalog.application.Query;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -27,8 +27,8 @@ public abstract class SearchProductsUseCase
             String brand,
             BigDecimal price,
             boolean active,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            Instant createdAt,
+            Instant updatedAt
     ) {
     }
 }

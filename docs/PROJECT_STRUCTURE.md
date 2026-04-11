@@ -33,7 +33,7 @@ Contém a lógica de negócios pura, entidades e regras. **Sem dependências de 
 #### `product/` — Agregado Principal
 
 - **`Product.java`**: Entidade raiz do agregado (Aggregate Root). Encapsula todos os atributos do produto (`name`, `description`, `category`, `brand`, `price`, `active`, `createdAt`, `updatedAt`). Construtor é privado; instâncias são criadas via factory methods estáticos. Utiliza `AssertionConcern` para validação defensiva técnica (Fail-Fast) tanto no construtor quanto no método `update`.
-  - `newProduct(...)`: gera um novo `ProductID` único (UUID) e define `createdAt`/`updatedAt` com `LocalDateTime.now()`.
+  - `newProduct(...)`: gera um novo `ProductID` único (UUID) e define `createdAt`/`updatedAt` com `Instant.now()`.
   - `with(...)`: reconstrói uma entidade a partir de dados persistidos.
   - `update(...)`: aplica validações fail-fast, atualiza os campos e define `updatedAt` com o timestamp atual.
   - `deactivate()`: define `active = false` e atualiza `updatedAt`. Implementa soft-delete.

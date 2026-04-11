@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +34,7 @@ class DefaultSearchProductsUseCaseTest {
         final var query = "Notebook";
         final var input = new SearchProductsUseCase.Input(query);
         final var summary = new ProductSummary(
-                "id-1", "Notebook", "Desc", "Cat", "Brand", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now()
+                "id-1", "Notebook", "Desc", "Cat", "Brand", BigDecimal.TEN, true, Instant.now(), Instant.now()
         );
 
         when(productGateway.searchProductsSummary(anyString())).thenReturn(List.of(summary));

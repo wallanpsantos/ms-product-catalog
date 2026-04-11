@@ -1,7 +1,7 @@
 package com.example.catalog.application.port.output.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * DTO de Projeção para consultas otimizadas.
@@ -19,7 +19,7 @@ public record ProductSummary(
         String brand,
         BigDecimal price,
         boolean active,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

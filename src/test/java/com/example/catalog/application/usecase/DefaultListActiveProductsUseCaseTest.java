@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +34,7 @@ class DefaultListActiveProductsUseCaseTest {
         // Given
         final var query = new SearchQuery(0, 10, "", "name", "asc");
         final var summary = new ProductSummary(
-                "id-1", "Notebook", "Desc", "Cat", "Brand", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now()
+                "id-1", "Notebook", "Desc", "Cat", "Brand", BigDecimal.TEN, true, Instant.now(), Instant.now()
         );
         final var expectedPagination = new Pagination<>(0, 10, 1, List.of(summary));
 

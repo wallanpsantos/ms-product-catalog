@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,8 +32,8 @@ class ProductJpaRepositoryIntegrationTest {
                 "BrandX",
                 new BigDecimal("3000.00"),
                 true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                Instant.now(),
+                Instant.now()
         );
         ProductJpaEntity inactiveProduct = new ProductJpaEntity(
                 UUID.randomUUID().toString(),
@@ -43,8 +43,8 @@ class ProductJpaRepositoryIntegrationTest {
                 "BrandY",
                 new BigDecimal("500.00"),
                 false,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                Instant.now(),
+                Instant.now()
         );
 
         repository.saveAll(List.of(activeProduct, inactiveProduct));
@@ -71,8 +71,8 @@ class ProductJpaRepositoryIntegrationTest {
                 "BrandZ",
                 new BigDecimal("8000.00"),
                 true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                Instant.now(),
+                Instant.now()
         );
         ProductJpaEntity prod2 = new ProductJpaEntity(
                 UUID.randomUUID().toString(),
@@ -82,8 +82,8 @@ class ProductJpaRepositoryIntegrationTest {
                 "BrandZ",
                 new BigDecimal("300.00"),
                 true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                Instant.now(),
+                Instant.now()
         );
         ProductJpaEntity inactiveProd = new ProductJpaEntity(
                 UUID.randomUUID().toString(),
@@ -93,8 +93,8 @@ class ProductJpaRepositoryIntegrationTest {
                 "BrandZ",
                 new BigDecimal("150.00"),
                 false,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                Instant.now(),
+                Instant.now()
         );
 
         repository.saveAll(List.of(prod1, prod2, inactiveProd));

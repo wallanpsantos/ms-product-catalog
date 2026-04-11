@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -121,7 +121,7 @@ class ProductTest {
         final var expectedBrand = "Dell";
         final var expectedPrice = new BigDecimal("5000.00");
         final var expectedActive = true;
-        final var now = LocalDateTime.now();
+        final var now = Instant.now();
 
         // When
         final var actualProduct = Product.with(

@@ -2,7 +2,7 @@ package com.example.catalog.infrastructure.adapter.input.rest.dto.response;
 
 import com.example.catalog.domain.validation.Error;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -17,9 +17,9 @@ public record ErrorResponse(
         int status,
         String message,
         List<Error> errors,
-        LocalDateTime timestamp
+        Instant timestamp
 ) {
-    public ErrorResponse(int status, String message, LocalDateTime timestamp) {
+    public ErrorResponse(int status, String message, Instant timestamp) {
         this(status, message, null, timestamp);
     }
 }

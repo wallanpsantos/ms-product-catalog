@@ -35,12 +35,12 @@ Métodos de alteração de estado são estritamente imperativos.
 // PURISMO CQS: Métodos de comando retornam void.
 public void update(String name) { 
     this.name = name; 
-    this.updatedAt = LocalDateTime.now();
+    this.updatedAt = Instant.now();
 }
 
 public void deactivate() { 
     this.active = false; 
-    this.updatedAt = LocalDateTime.now();
+    this.updatedAt = Instant.now();
 }
 ```
 

@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ class ProductJpaQueryAdapterTest {
     void givenId_whenFindSummaryById_thenReturnSummary() {
         // Given
         final var id = ProductID.unique();
-        final var entity = new ProductJpaEntity(id.getValue(), "N", "D", "C", "B", BigDecimal.TEN, null, LocalDateTime.now(), LocalDateTime.now());
+        final var entity = new ProductJpaEntity(id.getValue(), "N", "D", "C", "B", BigDecimal.TEN, null, Instant.now(), Instant.now());
         when(repository.findById(id.getValue())).thenReturn(Optional.of(entity));
 
         // When
@@ -55,7 +55,7 @@ class ProductJpaQueryAdapterTest {
     void givenSearchQuery_whenFindAllActiveSummary_thenReturnPagination() {
         // Given
         final var query = new SearchQuery(0, 10, "", "name", "asc");
-        final var entity = new ProductJpaEntity("id", "N", "D", "C", "B", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now());
+        final var entity = new ProductJpaEntity("id", "N", "D", "C", "B", BigDecimal.TEN, true, Instant.now(), Instant.now());
         final var page = new PageImpl<>(List.of(entity));
 
         when(repository.findAllByActiveTrue(any(PageRequest.class))).thenReturn(page);
@@ -74,7 +74,7 @@ class ProductJpaQueryAdapterTest {
     void givenSearchQueryDesc_whenFindAllActiveSummary_thenReturnPagination() {
         // Given
         final var query = new SearchQuery(0, 10, "", "name", "desc");
-        final var entity = new ProductJpaEntity("id", "N", "D", "C", "B", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now());
+        final var entity = new ProductJpaEntity("id", "N", "D", "C", "B", BigDecimal.TEN, true, Instant.now(), Instant.now());
         final var page = new PageImpl<>(List.of(entity));
 
         when(repository.findAllByActiveTrue(any(PageRequest.class))).thenReturn(page);
@@ -93,7 +93,7 @@ class ProductJpaQueryAdapterTest {
     void givenTerm_whenSearchProductsSummary_thenReturnList() {
         // Given
         final var term = "term";
-        final var entity = new ProductJpaEntity("id", "N", "D", "C", "B", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now());
+        final var entity = new ProductJpaEntity("id", "N", "D", "C", "B", BigDecimal.TEN, true, Instant.now(), Instant.now());
         when(repository.searchActiveProducts(anyString())).thenReturn(List.of(entity));
 
         // When

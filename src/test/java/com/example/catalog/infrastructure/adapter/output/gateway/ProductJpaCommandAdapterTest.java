@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,7 +101,7 @@ class ProductJpaCommandAdapterTest {
     void givenId_whenFindById_thenReturnOptional() {
         // Given
         final var id = ProductID.unique();
-        final var entity = new ProductJpaEntity(id.getValue(), "N", "D", "C", "B", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now());
+        final var entity = new ProductJpaEntity(id.getValue(), "N", "D", "C", "B", BigDecimal.TEN, true, Instant.now(), Instant.now());
         when(repository.findById(id.getValue())).thenReturn(Optional.of(entity));
 
         // When
@@ -118,7 +118,7 @@ class ProductJpaCommandAdapterTest {
     void givenIds_whenFindAllById_thenReturnList() {
         // Given
         final var id = ProductID.unique();
-        final var entity = new ProductJpaEntity(id.getValue(), "N", "D", "C", "B", BigDecimal.TEN, true, LocalDateTime.now(), LocalDateTime.now());
+        final var entity = new ProductJpaEntity(id.getValue(), "N", "D", "C", "B", BigDecimal.TEN, true, Instant.now(), Instant.now());
         when(repository.findAllById(anyList())).thenReturn(List.of(entity));
 
         // When

@@ -5,7 +5,7 @@ import com.example.catalog.domain.pagination.Pagination;
 import com.example.catalog.domain.pagination.SearchQuery;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Porta de Entrada para listar produtos ativos com paginação.
@@ -25,8 +25,8 @@ public abstract class ListActiveProductsUseCase
             String brand,
             BigDecimal price,
             boolean active,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            Instant createdAt,
+            Instant updatedAt
     ) {
     }
 }
