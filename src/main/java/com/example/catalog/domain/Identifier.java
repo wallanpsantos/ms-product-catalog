@@ -1,7 +1,5 @@
 package com.example.catalog.domain;
 
-import java.util.Objects;
-
 /**
  * Classe base para todos os identificadores de domínio.
  * <p>
@@ -16,22 +14,10 @@ import java.util.Objects;
 public abstract class Identifier extends AssertionConcern implements ValueObject {
 
     public abstract String getValue();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Identifier that = (Identifier) o;
-        return Objects.equals(getValue(), that.getValue());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getValue());
-    }
-
+    
     @Override
     public String toString() {
         return getValue();
     }
+
 }

@@ -42,9 +42,14 @@ import java.time.Instant;
  *   Records implementam igualdade estrutural comparando todos os campos, o que viola o princípio de identidade contínua do DDD.</li>
  * </ol>
  * </p>
+ * <p>
+ * <strong>Decisão arquitetural sobre {@code equals}:</strong>
+ * esta classe herda a implementação de {@code equals} e {@code hashCode} de {@link Entity},
+ * que compara apenas o identificador. Isso é intencional no modelo de domínio, pois a
+ * identidade do agregado é determinada exclusivamente pelo ID, e não pelos seus atributos.
+ * </p>
  */
 @SuppressWarnings("java:S2160")
-// Subclasses de Entity não devem sobrescrever equals; a identidade é baseada apenas no ID.
 public class Product extends Entity<ProductID> {
 
     private String name;
