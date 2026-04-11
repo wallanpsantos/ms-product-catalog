@@ -1,7 +1,6 @@
 package com.example.catalog.domain.product;
 
 import com.example.catalog.UnitTest;
-import com.example.catalog.domain.exception.DomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +8,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @UnitTest
 class ProductTest {
@@ -99,15 +97,22 @@ class ProductTest {
     }
 
     @Test
-    @DisplayName("Deve lancar erro ao instanciar produto com nome vazio (Fail Fast)")
-    void givenAnInvalidNullName_whenCallNewProduct_thenShouldThrowDomainException() {
+    @DisplayName("Deve validar produto com nome vazio acumulando erros (Notification Pattern)")
+    void givenAnInvalidNullName_whenCallNewProduct_thenShouldAccumulateError() {
         // Given
         final String expectedName = null;
+        final var expectedErrorCount = 1;
+        final var expectedErrorMessage = "'name' should not be empty";
 
-        // When/Then
-        assertThatThrownBy(() -> Product.newProduct(expectedName, "Desc", "Cat", "Brand", new BigDecimal("10.0"), true))
-                .isInstanceOf(DomainException.class)
-                .hasMessage("'name' should not be empty or null");
+        final var actualProduct = Product.newProduct(expectedName, "Desc", "Cat", "Brand", new BigDecimal("10.0"), true);
+        final var notification = com.example.catalog.domain.validation.handler.Notification.create();
+
+        // When
+        actualProduct.validate(notification);
+
+        // Then
+        assertThat(notification.getErrors()).hasSize(expectedErrorCount);
+        assertThat(notification.getErrors().getFirst().message()).isEqualTo(expectedErrorMessage);
     }
 
     @Test

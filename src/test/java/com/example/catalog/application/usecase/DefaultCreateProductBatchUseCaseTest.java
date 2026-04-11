@@ -3,7 +3,6 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.UnitTest;
 import com.example.catalog.application.port.input.CreateProductUseCase;
 import com.example.catalog.application.port.output.ProductCommandGateway;
-import com.example.catalog.domain.exception.DomainException;
 import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.domain.product.Product;
 import com.example.catalog.domain.validation.Error;
@@ -54,15 +53,15 @@ class DefaultCreateProductBatchUseCaseTest {
     }
 
     @Test
-    @DisplayName("Deve lançar DomainException se houver erro de validacao (Fail Fast)")
-    void givenInvalidInput_whenCreateBatch_thenThrowDomainException() {
+    @DisplayName("Deve lançar NotificationException se houver erro de validacao no lote")
+    void givenInvalidInput_whenCreateBatch_thenThrowNotificationException() {
         // Given
         final var input1 = new CreateProductUseCase.Input("", "D1", "C1", "B1", BigDecimal.TEN, true);
 
         // When / Then
         assertThatThrownBy(() -> useCase.execute(List.of(input1)))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'name' should not be empty or null");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Erro de validação no item do lote índice: 0");
     }
 
     @Test

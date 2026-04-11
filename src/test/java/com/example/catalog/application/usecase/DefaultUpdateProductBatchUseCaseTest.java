@@ -73,8 +73,8 @@ class DefaultUpdateProductBatchUseCaseTest {
     }
 
     @Test
-    @DisplayName("Deve lancar DomainException se houver erro de validacao (Fail Fast)")
-    void givenInvalidData_whenCallUpdateBatch_thenThrowDomainException() {
+    @DisplayName("Deve lançar NotificationException se houver erro de validacao no lote")
+    void givenInvalidData_whenCallUpdateBatch_thenThrowNotificationException() {
         // Given
         final var product1 = Product.newProduct("P1", "D1", "C1", "B1", BigDecimal.TEN, true);
 

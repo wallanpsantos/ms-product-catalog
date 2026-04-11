@@ -2,7 +2,7 @@ package com.example.catalog.application.usecase;
 
 import com.example.catalog.IntegrationTest;
 import com.example.catalog.application.port.input.CreateProductUseCase;
-import com.example.catalog.domain.exception.DomainException;
+import com.example.catalog.domain.exception.NotificationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,8 +79,8 @@ class DefaultCreateProductUseCaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve lançar DomainException quando nome está em branco")
-    void shouldThrowDomainExceptionWhenNameIsBlank() {
+    @DisplayName("Deve lançar NotificationException quando nome está em branco")
+    void shouldThrowNotificationExceptionWhenNameIsBlank() {
         // Given
         final var input = new CreateProductUseCase.Input(
                 "",
@@ -94,13 +94,13 @@ class DefaultCreateProductUseCaseIntegrationTest {
         // When
         // Then
         assertThatThrownBy(() -> createProductUseCase.execute(input))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'name' should not be empty or null");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Não foi possível criar o Agregado de Produto");
     }
 
     @Test
-    @DisplayName("Deve lançar DomainException quando preço é nulo")
-    void shouldThrowDomainExceptionWhenPriceIsNull() {
+    @DisplayName("Deve lançar NotificationException quando preço é nulo")
+    void shouldThrowNotificationExceptionWhenPriceIsNull() {
         // Given
         final var input = new CreateProductUseCase.Input(
                 "Produto Válido",
@@ -114,7 +114,7 @@ class DefaultCreateProductUseCaseIntegrationTest {
         // When
         // Then
         assertThatThrownBy(() -> createProductUseCase.execute(input))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'price' must be greater than zero");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Não foi possível criar o Agregado de Produto");
     }
 }

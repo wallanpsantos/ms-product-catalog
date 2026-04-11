@@ -3,7 +3,7 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.IntegrationTest;
 import com.example.catalog.application.port.input.CreateProductBatchUseCase;
 import com.example.catalog.application.port.input.CreateProductUseCase;
-import com.example.catalog.domain.exception.DomainException;
+import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,12 +46,12 @@ class DefaultCreateProductBatchUseCaseIntegrationTest {
         // Given
         final var initialCount = repository.count();
         final var valid = new CreateProductUseCase.Input("Valid Product", "D", "C", "B", BigDecimal.TEN, true);
-        // "" triggers fail-fast in validator
+        // "" triggers validation error
         final var invalid = new CreateProductUseCase.Input("", "D", "C", "B", BigDecimal.TEN, true);
 
         // When / Then
         assertThatThrownBy(() -> useCase.execute(List.of(valid, invalid)))
-                .isInstanceOf(DomainException.class);
+                .isInstanceOf(NotificationException.class);
 
         // Verify transaction boundaries / no partial commit
         assertThat(repository.count()).isEqualTo(initialCount);

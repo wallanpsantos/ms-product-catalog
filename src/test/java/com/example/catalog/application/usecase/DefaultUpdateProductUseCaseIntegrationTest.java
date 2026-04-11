@@ -62,8 +62,8 @@ class DefaultUpdateProductUseCaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve lançar DomainException quando dados são inválidos (fail-fast)")
-    void shouldThrowDomainExceptionWhenDataIsInvalid() {
+    @DisplayName("Deve lançar NotificationException quando dados são inválidos")
+    void shouldThrowNotificationExceptionWhenDataIsInvalid() {
         // Given
         final var createInput = new CreateProductUseCase.Input(
                 "Valid Name", "Valid Desc", "Cat", "Brand", BigDecimal.TEN, true

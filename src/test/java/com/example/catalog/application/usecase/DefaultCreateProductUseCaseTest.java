@@ -3,7 +3,6 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.UnitTest;
 import com.example.catalog.application.port.input.CreateProductUseCase;
 import com.example.catalog.application.port.output.ProductCommandGateway;
-import com.example.catalog.domain.exception.DomainException;
 import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.domain.product.Product;
 import com.example.catalog.domain.validation.Error;
@@ -59,8 +58,8 @@ class DefaultCreateProductUseCaseTest {
     }
 
     @Test
-    @DisplayName("Deve lançar DomainException no construtor fail-fast ao criar produto com valores inválidos nulos")
-    void givenInvalidInputWithNulls_whenExecute_thenThrowDomainException() {
+    @DisplayName("Deve lançar NotificationException ao criar produto com valores inválidos nulos")
+    void givenInvalidInputWithNulls_whenExecute_thenThrowNotificationException() {
         // Given
         final var input = new CreateProductUseCase.Input(
                 null, "Um smartphone potente", "Electronics",
@@ -69,8 +68,8 @@ class DefaultCreateProductUseCaseTest {
 
         // When/Then
         assertThatThrownBy(() -> useCase.execute(input))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'name' should not be empty or null");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Não foi possível criar o Agregado de Produto");
 
         verify(productGateway, times(0)).create(any());
     }

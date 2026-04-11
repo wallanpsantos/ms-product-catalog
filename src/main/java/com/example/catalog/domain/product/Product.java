@@ -30,8 +30,8 @@ import java.time.Instant;
  * <p>
  * <strong>Validação:</strong>
  * Utiliza {@link com.example.catalog.domain.AssertionConcern} no construtor para validação defensiva (fail-fast)
- * de integridade técnica, e {@link ProductValidator} (Notification Pattern) para
- * validação de regras de negócio complexas.
+ * de integridade técnica (invariantes absolutas como a presença do ID), e {@link ProductValidator}
+ * (Notification Pattern) para validação de todas as regras de negócio do produto.
  * </p>
  * <p>
  * <strong>Por que NÃO usamos {@code record} para Agregados?</strong>
@@ -74,18 +74,6 @@ public class Product extends Entity<ProductID> {
             final Instant updatedAt
     ) {
         super(id);
-        this.assertArgumentNotEmpty(name, "'name' should not be empty or null");
-        this.assertArgumentLength(name, 255, "'name' must be between 1 and 255 characters");
-
-        this.assertArgumentNotEmpty(description, "'description' should not be empty or null");
-        this.assertArgumentLength(description, 4000, "'description' must be at most 4000 characters");
-
-        this.assertArgumentNotEmpty(category, "'category' should not be empty or null");
-
-        this.assertArgumentNotEmpty(brand, "'brand' should not be empty or null");
-
-        this.assertArgumentPositive(price, "'price' must be greater than zero");
-
         this.name = name;
         this.description = description;
         this.category = category;

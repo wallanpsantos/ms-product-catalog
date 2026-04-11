@@ -3,7 +3,7 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.IntegrationTest;
 import com.example.catalog.application.port.input.UpdateProductBatchUseCase;
 import com.example.catalog.application.port.input.UpdateProductUseCase;
-import com.example.catalog.domain.exception.DomainException;
+import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaEntityFixture;
 import com.example.catalog.infrastructure.adapter.output.persistence.ProductJpaRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +65,7 @@ class DefaultUpdateProductBatchUseCaseIntegrationTest {
 
         // When / Then
         assertThatThrownBy(() -> useCase.execute(List.of(valid, invalid)))
-                .isInstanceOf(DomainException.class);
+                .isInstanceOf(NotificationException.class);
 
         // Verify transaction boundaries / old states are preserved
         final var entity1 = repository.findById(id1).orElseThrow();
