@@ -55,6 +55,15 @@ jobs:
       # ~/.gradle/wrapper, and the build-scan token automatically.
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
+        with:
+          # cache-read-only garante que apenas pushes nas branches principais gravam o cache — PRs apenas leem.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
+          gradle-home-cache-includes: |
+            caches
+            notifications
+          # inclui o build-cache local do projeto
+          build-scan-publish: false
+
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
