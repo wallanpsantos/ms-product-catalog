@@ -1,7 +1,7 @@
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.4"
     id("org.sonarqube") version "7.2.2.6593"
@@ -38,13 +38,13 @@ repositories {
     mavenCentral()
 }
 
-extra["springCloudVersion"] = "2025.1.0"
-extra["springDocVersion"] = "3.0.1"
+extra["springCloudVersion"] = "2025.1.1"
+extra["springDocVersion"] = "3.0.2"
 extra["archunitVersion"] = "1.4.1"
 extra["slf4jVersion"] = "2.0.17"
 extra["mapstructVersion"] = "1.7.0.Beta1"
 extra["restAssuredVersion"] = "6.0.0"
-extra["testcontainersVersion"] = "1.21.4"
+extra["testcontainersVersion"] = "2.0.4"
 
 
 dependencies {
@@ -65,10 +65,11 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured:${property("restAssuredVersion")}")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.testcontainers:kafka")
-    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("org.testcontainers:testcontainers-kafka")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers:${property("testcontainersVersion")}")
     testImplementation("com.tngtech.archunit:archunit-junit5:${property("archunitVersion")}")
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 
