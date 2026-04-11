@@ -3,7 +3,6 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.UnitTest;
 import com.example.catalog.application.port.input.UpdateProductUseCase;
 import com.example.catalog.application.port.output.ProductCommandGateway;
-import com.example.catalog.domain.exception.DomainException;
 import com.example.catalog.domain.exception.NotFoundException;
 import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.domain.product.Product;
@@ -85,8 +84,8 @@ class DefaultUpdateProductUseCaseTest {
     }
 
     @Test
-    @DisplayName("Deve lançar DomainException no construtor fail-fast ao atualizar com valores inválidos nulos")
-    void givenInvalidInputWithNulls_whenExecute_thenThrowDomainException() {
+    @DisplayName("Deve lançar NotificationException ao atualizar com valores inválidos nulos")
+    void givenInvalidInputWithNulls_whenExecute_thenThrowNotificationException() {
         // Given
         final var expectedId = UUID.randomUUID().toString();
         final var product = Product.newProduct("Nome Antigo", "Desc Antiga", "Cat Antiga", "Brand", new BigDecimal("10.0"), true);
@@ -100,8 +99,8 @@ class DefaultUpdateProductUseCaseTest {
 
         // When/Then
         assertThatThrownBy(() -> useCase.execute(input))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'name' should not be empty or null");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Não foi possível atualizar o Agregado de Produto");
 
         verify(productGateway, times(1)).findById(ProductID.from(expectedId));
         verify(productGateway, times(0)).update(any());

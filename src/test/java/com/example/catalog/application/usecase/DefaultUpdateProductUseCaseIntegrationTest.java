@@ -3,8 +3,8 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.IntegrationTest;
 import com.example.catalog.application.port.input.CreateProductUseCase;
 import com.example.catalog.application.port.input.UpdateProductUseCase;
-import com.example.catalog.domain.exception.DomainException;
 import com.example.catalog.domain.exception.NotFoundException;
+import com.example.catalog.domain.exception.NotificationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ class DefaultUpdateProductUseCaseIntegrationTest {
         // When
         // Then
         assertThatThrownBy(() -> updateProductUseCase.execute(updateInput))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'name' should not be empty or null");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Não foi possível atualizar o Agregado de Produto");
     }
 }

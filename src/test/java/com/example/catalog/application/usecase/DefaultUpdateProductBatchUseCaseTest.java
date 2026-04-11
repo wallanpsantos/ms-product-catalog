@@ -3,8 +3,8 @@ package com.example.catalog.application.usecase;
 import com.example.catalog.UnitTest;
 import com.example.catalog.application.port.input.UpdateProductUseCase;
 import com.example.catalog.application.port.output.ProductCommandGateway;
-import com.example.catalog.domain.exception.DomainException;
 import com.example.catalog.domain.exception.NotFoundException;
+import com.example.catalog.domain.exception.NotificationException;
 import com.example.catalog.domain.product.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -85,7 +85,7 @@ class DefaultUpdateProductBatchUseCaseTest {
 
         // When / Then
         assertThatThrownBy(() -> useCase.execute(List.of(input1)))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("'name' should not be empty or null");
+                .isInstanceOf(NotificationException.class)
+                .hasMessageContaining("Erro de validação no item do lote índice: 0");
     }
 }

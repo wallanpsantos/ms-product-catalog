@@ -131,14 +131,6 @@ public class Product extends Entity<ProductID> {
             final BigDecimal price,
             final boolean active
     ) {
-        this.assertArgumentNotEmpty(name, "'name' should not be empty or null");
-        this.assertArgumentLength(name, 255, "'name' must be between 1 and 255 characters");
-        this.assertArgumentNotEmpty(description, "'description' should not be empty or null");
-        this.assertArgumentLength(description, 4000, "'description' must be at most 4000 characters");
-        this.assertArgumentNotEmpty(category, "'category' should not be empty or null");
-        this.assertArgumentNotEmpty(brand, "'brand' should not be empty or null");
-        this.assertArgumentPositive(price, "'price' must be greater than zero");
-
         this.name = name;
         this.description = description;
         this.category = category;

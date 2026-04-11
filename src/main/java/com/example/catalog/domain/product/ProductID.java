@@ -2,7 +2,6 @@ package com.example.catalog.domain.product;
 
 import com.example.catalog.domain.Identifier;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -34,14 +33,4 @@ public final class ProductID extends Identifier {
         return value;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ProductID productID)) return false;
-        return Objects.equals(value, productID.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(value);
-    }
 }
