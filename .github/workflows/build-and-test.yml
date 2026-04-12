@@ -53,17 +53,23 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # Replaces the manual cache step — handles ~/.gradle/caches,
-      # ~/.gradle/wrapper, and the build-scan token automatically.
+      # gradle/actions/setup-gradle substitui o actions/cache manual:
+      # gerencia ~/.gradle/caches e ~/.gradle/wrapper automaticamente entre runs.
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          # cache-read-only garante que apenas pushes nas branches principais gravam o cache — PRs apenas leem.
+          # PRs apenas leem o cache — somente pushes nas branches principais gravam,
+          # evitando que branches temporárias poluam o cache compartilhado.
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
+
+          # `caches` → dependências resolvidas, outputs do Build Cache e metadata do Gradle
+          # `notifications` → controla avisos de versão do Gradle (evita re-download desnecessário)
           gradle-home-cache-includes: |
             caches
             notifications
-          # inclui o build-cache local do projeto
+
+          # Desativa o envio automático de Build Scans para o Gradle Enterprise/Develocity.
+          # Sem isso, o Gradle pode tentar publicar métricas de build externamente em todo run de CI.
           build-scan-publish: false
 
 
