@@ -32,11 +32,11 @@ Microsserviço de **Catálogo de Produtos** desenvolvido com **Clean Architectur
 
 [![Build and Test](https://github.com/wallanpsantos/ms-product-catalog/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/wallanpsantos/ms-product-catalog/actions/workflows/build-and-test.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.3-blue?logo=postgresql)](https://www.postgresql.org/)
 [![GraalVM](https://img.shields.io/badge/GraalVM-Native%20Image-orange)](https://www.graalvm.org/)
 [![Docker Compose](https://img.shields.io/badge/Docker%20Compose-blue?logo=docker)](https://docs.docker.com/compose/)
-[![Gradle](https://img.shields.io/badge/Gradle-9.3.1-blue?logo=gradle)](https://gradle.org/)
+[![Gradle](https://img.shields.io/badge/Gradle-9.4.1-blue?logo=gradle)](https://gradle.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
