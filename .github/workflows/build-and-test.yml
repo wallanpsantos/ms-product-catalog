@@ -72,10 +72,13 @@ jobs:
 
       # `build` compila, roda os testes (com JaCoCo) e monta o JAR.
       # `-x nativeCompile` pula o step lento do GraalVM AOT — desnecessário no CI.
-      # Em builds de release (tag), `clean` é injetado para garantir artefato 100% limpo.
-      # Em PRs e pushes de desenvolvimento, o Gradle recompila apenas o que mudou via Build Cache.
+      # Em builds de release (tag) e na main, `clean` é injetado para garantir artefato 100% limpo.
+      # Em PRs e pushes no develop, o Gradle recompila apenas o que mudou via Build Cache.
       - name: Build with Gradle
-        run: ./gradlew ${{ startsWith(github.ref, 'refs/tags/') && 'clean ' || '' }}build -x nativeCompile
+        run: >-
+          ./gradlew
+          ${{ (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main') && 'clean ' || '' }}build
+          -x nativeCompile
 
       - name: Run SonarCloud Analysis
         env:
