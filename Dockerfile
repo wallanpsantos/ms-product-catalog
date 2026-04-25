@@ -1,5 +1,5 @@
 # ── Stage 1: Builder ─────────────────────────────────────────────
-FROM ghcr.io/graalvm/native-image-community:21.0.2 AS builder
+FROM ghcr.io/graalvm/graalvm-community:25.0.2 AS builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN ./gradlew nativeCompile --no-daemon -x test
 
 # ── Stage 2: Runtime ─────────────────────────────────────────────
 # Minimal Alpine base: ~8 MB, no JDK, no build tools.
-FROM alpine:3.21.3
+FROM alpine:3.22.4
 
 # Values injected at build time from application.yml via compose build.args.
 # Defaults mirror application.yml so a plain `docker build .` still works.
