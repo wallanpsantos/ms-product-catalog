@@ -32,6 +32,11 @@ tasks.withType<Test> {
 
 tasks.withType<JavaExec> {
     systemProperty("file.encoding", "UTF-8")
+    jvmArgs(
+        "-Dfile.encoding=UTF-8",
+        "-Dsun.stdout.encoding=UTF-8",
+        "-Dsun.stderr.encoding=UTF-8"
+    )
 }
 
 repositories {
