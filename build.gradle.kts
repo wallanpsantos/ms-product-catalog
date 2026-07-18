@@ -12,7 +12,7 @@ version = "1.0.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -32,6 +32,11 @@ tasks.withType<Test> {
 
 tasks.withType<JavaExec> {
     systemProperty("file.encoding", "UTF-8")
+    jvmArgs(
+        "-Dfile.encoding=UTF-8",
+        "-Dsun.stdout.encoding=UTF-8",
+        "-Dsun.stderr.encoding=UTF-8"
+    )
 }
 
 repositories {
@@ -39,12 +44,12 @@ repositories {
 }
 
 extra["springCloudVersion"] = "2025.1.1"
-extra["springDocVersion"] = "3.0.2"
-extra["archunitVersion"] = "1.4.1"
+extra["springDocVersion"] = "3.0.3"
+extra["archunitVersion"] = "1.4.2"
 extra["slf4jVersion"] = "2.0.17"
 extra["mapstructVersion"] = "1.7.0.Beta1"
 extra["restAssuredVersion"] = "6.0.0"
-extra["testcontainersVersion"] = "2.0.4"
+extra["testcontainersVersion"] = "2.0.5"
 
 
 dependencies {
